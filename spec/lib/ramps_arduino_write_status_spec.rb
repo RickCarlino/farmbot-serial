@@ -1,8 +1,8 @@
-describe HardwareInterfaceArduinoWriteStatus do
+describe Fb::HardwareInterfaceArduinoWriteStatus do
 
   before do
-    HardwareInterface.current.status = Status.new
-    @ramps = HardwareInterfaceArduinoWriteStatus.new()
+    Fb::HardwareInterface.current.status = Fb::Status.new
+    @ramps = Fb::HardwareInterfaceArduinoWriteStatus.new()
   end
 
   it "is busy 1" do

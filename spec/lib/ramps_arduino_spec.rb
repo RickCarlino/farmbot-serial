@@ -1,12 +1,12 @@
 require 'spec_helper'
-describe HardwareInterfaceArduino do
+describe Fb::HardwareInterfaceArduino do
 
   before do
-    HardwareInterface.current.status = Status.new
+    Fb::HardwareInterface.current.status = Fb::Status.new
 
-    @ramps = HardwareInterfaceArduino.new(true)
+    @ramps = Fb::HardwareInterfaceArduino.new(true)
 
-    @ramps_param = HardwareInterfaceParam.new
+    @ramps_param = Fb::HardwareInterfaceParam.new
     @ramps.ramps_param = @ramps_param
   end
 
@@ -27,12 +27,12 @@ describe HardwareInterfaceArduino do
 
   it "execute_command with causing an error"  do
 
-    HardwareInterface.current.status = nil
+    Fb::HardwareInterface.current.status = nil
 
     @ramps.serial_port.rts = 0
     @ramps.execute_command(nil,nil,nil)
 
-    HardwareInterface.current.status = Status.new
+    Fb::HardwareInterface.current.status = Fb::Status.new
 
     expect { @ramps }.to_not raise_error
 
@@ -183,7 +183,7 @@ describe HardwareInterfaceArduino do
 
     @ramps.process_code_and_params(write_status)
 
-    expect(HardwareInterface.current.status.device_version).to eq(write_status.params)
+    expect(Fb::HardwareInterface.current.status.device_version).to eq(write_status.params)
 
   end
 
@@ -214,14 +214,14 @@ describe HardwareInterfaceArduino do
 
   it "emergency stop off" do
     @ramps.serial_port.test_serial_write = ""
-    HardwareInterface.current.status.emergency_stop = false
+    Fb::HardwareInterface.current.status.emergency_stop = false
     @ramps.check_emergency_stop
     expect(@ramps.serial_port.test_serial_write).to eq("")
   end
 
   it "emergency stop on" do
     @ramps.serial_port.test_serial_write = ""
-    HardwareInterface.current.status.emergency_stop = true
+    Fb::HardwareInterface.current.status.emergency_stop = true
     @ramps.check_emergency_stop
     expect(@ramps.serial_port.test_serial_write).to eq("E\n")
   end
@@ -239,7 +239,7 @@ describe HardwareInterfaceArduino do
 
   it "process value split two letters" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = "ZA1 ZB2 XA3 XB4 YA5 YB6"
     @ramps.process_value_split(code, params, text)
@@ -254,7 +254,7 @@ describe HardwareInterfaceArduino do
 
   it "process value split one letters" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R99"
     text = "P1 V2 X3 Y4 Z5"
     @ramps.process_value_split(code, params, text)
@@ -275,7 +275,7 @@ describe HardwareInterfaceArduino do
     code = "R21"
     text = "P#{param} V#{value}"
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R21(params,code)
 
@@ -293,7 +293,7 @@ describe HardwareInterfaceArduino do
     code = "R23"
     text = "P#{param} V#{value}"
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R23(params,code)
 
@@ -314,7 +314,7 @@ describe HardwareInterfaceArduino do
 
     @ramps.external_info = exinf
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R41(params,code)
 
@@ -333,103 +333,103 @@ describe HardwareInterfaceArduino do
 
   it "process value R81 XA" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = " XA1 XB0 YA0 YB0 ZA0 ZB0 "
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R81(params,code)
 
-    expect(HardwareInterface.current.status.info_end_stop_x_a).to eq(true)
-    expect(HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_a).to eq(true)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
 
   end
 
   it "process value R81 XB" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = " XA0 XB1 YA0 YB0 ZA0 ZB0 "
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R81(params,code)
 
-    expect(HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_x_b).to eq(true)
-    expect(HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_b).to eq(true)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
 
   end
 
   it "process value R81 YA" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = " XA0 XB0 YA1 YB0 ZA0 ZB0 "
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R81(params,code)
 
-    expect(HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_a).to eq(true)
-    expect(HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_a).to eq(true)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
 
   end
 
   it "process value R81 YB" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = " XA0 XB0 YA0 YB1 ZA0 ZB0 "
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R81(params,code)
 
-    expect(HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_b).to eq(true)
-    expect(HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_b).to eq(true)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
 
   end
 
   it "process value R81 ZA" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = " XA0 XB0 YA0 YB0 ZA1 ZB0 "
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R81(params,code)
 
-    expect(HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_a).to eq(true)
-    expect(HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_a).to eq(true)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_b).to eq(false)
 
   end
 
   it "process value R81 ZB" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = " XA0 XB0 YA0 YB0 ZA0 ZB1 "
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R81(params,code)
 
-    expect(HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_b).to eq(true)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_b).to eq(true)
 
   end
 
@@ -439,19 +439,19 @@ describe HardwareInterfaceArduino do
     y = rand(9999999).to_i
     z = rand(9999999).to_i
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R82"
     text = "X#{x} Y#{y} Z#{z}"
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_R82(params,code)
 
-    expect(HardwareInterface.current.status.info_current_x_steps).to eq(x)
-    expect(HardwareInterface.current.status.info_current_y_steps).to eq(y)
-    expect(HardwareInterface.current.status.info_current_z_steps).to eq(z)
+    expect(Fb::HardwareInterface.current.status.info_current_x_steps).to eq(x)
+    expect(Fb::HardwareInterface.current.status.info_current_y_steps).to eq(y)
+    expect(Fb::HardwareInterface.current.status.info_current_z_steps).to eq(z)
 
-    expect(HardwareInterface.current.status.info_current_x      ).to eq(x / @ramps_param.axis_x_steps_per_unit)
-    expect(HardwareInterface.current.status.info_current_y      ).to eq(y / @ramps_param.axis_y_steps_per_unit)
-    expect(HardwareInterface.current.status.info_current_z      ).to eq(z / @ramps_param.axis_z_steps_per_unit)
+    expect(Fb::HardwareInterface.current.status.info_current_x      ).to eq(x / @ramps_param.axis_x_steps_per_unit)
+    expect(Fb::HardwareInterface.current.status.info_current_y      ).to eq(y / @ramps_param.axis_y_steps_per_unit)
+    expect(Fb::HardwareInterface.current.status.info_current_z      ).to eq(z / @ramps_param.axis_z_steps_per_unit)
 
   end
 
@@ -461,7 +461,7 @@ describe HardwareInterfaceArduino do
 
     @ramps.process_value_process_R83(code, text)
 
-    expect(HardwareInterface.current.status.device_version).to eq(text)
+    expect(Fb::HardwareInterface.current.status.device_version).to eq(text)
   end
 
 
@@ -502,7 +502,7 @@ describe HardwareInterfaceArduino do
     code = "R21"
     text = "P#{param} V#{value}"
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_process_param_list(params,code)
 
@@ -521,7 +521,7 @@ describe HardwareInterfaceArduino do
     code = "R23"
     text = "P#{param} V#{value}"
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_process_param_list(params,code)
 
@@ -544,7 +544,7 @@ describe HardwareInterfaceArduino do
 
     @ramps.external_info = exinf
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_process_param_list(params,code)
 
@@ -568,7 +568,7 @@ describe HardwareInterfaceArduino do
 
     @ramps.process_value_process_R83(code, text)
 
-    expect(HardwareInterface.current.status.device_version).to eq(text)
+    expect(Fb::HardwareInterface.current.status.device_version).to eq(text)
 
   end
 
@@ -615,34 +615,34 @@ describe HardwareInterfaceArduino do
 
   it "process value 3" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = " XA0 XB0 YA0 YB0 ZA0 ZB1 "
     @ramps.process_value(code,text)
 
-    expect(HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_b).to eq(true)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_b).to eq(true)
 
   end
 
   it "process value named parameters 1" do
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R81"
     text = " XA0 XB0 YA0 YB0 ZA0 ZB1 "
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_process_named_params(params,code)
 
-    expect(HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
-    expect(HardwareInterface.current.status.info_end_stop_z_b).to eq(true)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_x_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_y_b).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_a).to eq(false)
+    expect(Fb::HardwareInterface.current.status.info_end_stop_z_b).to eq(true)
 
   end
 
@@ -652,19 +652,19 @@ describe HardwareInterfaceArduino do
     y = rand(9999999).to_i
     z = rand(9999999).to_i
 
-    params = HardwareInterfaceArduinoValuesReceived.new
+    params = Fb::HardwareInterfaceArduinoValuesReceived.new
     code = "R82"
     text = "X#{x} Y#{y} Z#{z}"
     @ramps.process_value_split(code, params, text)
     @ramps.process_value_process_named_params(params,code)
 
-    expect(HardwareInterface.current.status.info_current_x_steps).to eq(x)
-    expect(HardwareInterface.current.status.info_current_y_steps).to eq(y)
-    expect(HardwareInterface.current.status.info_current_z_steps).to eq(z)
+    expect(Fb::HardwareInterface.current.status.info_current_x_steps).to eq(x)
+    expect(Fb::HardwareInterface.current.status.info_current_y_steps).to eq(y)
+    expect(Fb::HardwareInterface.current.status.info_current_z_steps).to eq(z)
 
-    expect(HardwareInterface.current.status.info_current_x      ).to eq(x / @ramps_param.axis_x_steps_per_unit)
-    expect(HardwareInterface.current.status.info_current_y      ).to eq(y / @ramps_param.axis_y_steps_per_unit)
-    expect(HardwareInterface.current.status.info_current_z      ).to eq(z / @ramps_param.axis_z_steps_per_unit)
+    expect(Fb::HardwareInterface.current.status.info_current_x      ).to eq(x / @ramps_param.axis_x_steps_per_unit)
+    expect(Fb::HardwareInterface.current.status.info_current_y      ).to eq(y / @ramps_param.axis_y_steps_per_unit)
+    expect(Fb::HardwareInterface.current.status.info_current_z      ).to eq(z / @ramps_param.axis_z_steps_per_unit)
 
   end
 
