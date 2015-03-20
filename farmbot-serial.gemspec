@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "farmbot-serial"
-  spec.version       = '0.0.1' # TODO: Farmbot::Serial::VERSION
+  spec.version       = '0.0.1' # TODO: Fb::VERSION
   spec.authors       = ["Tim Evers", "Rick Carlino"]
   spec.email         = ["rick.carlino@gmail.com"]
   spec.description   = "Serial library for Farmbot"
@@ -23,5 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"#,        "~> 0.10"
   spec.add_development_dependency "simplecov"#,  "~> 0.9"
 
-  spec.add_runtime_dependency        "serialport"#, "~> 1.3"
+  spec.add_runtime_dependency     "serialport"#, "~> 1.3"
 end
