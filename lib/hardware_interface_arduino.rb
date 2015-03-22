@@ -12,7 +12,7 @@ module Fb
     attr_reader :is_busy
     attr_reader :is_error
     attr_reader :is_done
-    attr_reader :parameters
+    attr_reader :return_values
 
     # initialize the interface
     #
@@ -24,7 +24,7 @@ module Fb
       connect_board()
 
       @external_info     = ""
-      @parameters        = []
+      @return_values     = Queue.new
 
       @is_busy           = false
       @is_error          = false
@@ -188,10 +188,8 @@ module Fb
 
     # if there is an emergency stop, immediately write it to the arduino
     #
-    def check_emergency_stop
-      if (Fb::HardwareInterface.current.status.emergency_stop)
-       serial_port_write( "E\n" )
-      end
+    def emergency_stop
+     serial_port_write( "E\n" )
     end
 
     # write to log
@@ -200,39 +198,42 @@ module Fb
       puts "RD: #{write_status.received}" if write_status.onscreen
     end
 
-    def process_value_split(code, params, text)
-
-      params = Fb::HardwareInterfaceArduinoValuesReceived.new
-
-      # get all separate parameters from the text
-      text.split(' ').each do |param|
-
-        if code == "R81"
-         # this is the only code that uses two letter parameters
-          par_code  = param[0..1].to_s
-          par_value = param[2..-1].to_i
-        else
-          par_code  = param[0..0].to_s
-          par_value = param[1..-1].to_i
-        end
-
-        params.load_parameter(par_code, par_value)
-
-      end
-
-      return params
-    end
-
     # process values received from arduino
     #
     def process_value(code,text)
 
       # get all parameters in the current text
-      params = process_value_split(code, text)
+      return_value = process_value_split(code, text)
 
       # save the list for the client
-      @parameters << params
+      @return_values << return_value
 
+    end
+
+    def process_value_split(code, text)
+
+      params = Fb::HardwareInterfaceArduinoValuesReceived.new
+      params.code = code
+      params.text = text
+
+      # get all separate parameters from the text
+      text.split(' ').each do |param|
+
+        case code 
+	when "R81"
+          # this is the only code that uses two letter parameters
+          par_name  = param[0..1].to_s
+          par_value = param[2..-1].to_i
+        else
+          par_name  = param[0..0].to_s
+          par_value = param[1..-1].to_i
+        end
+
+        params.load_parameter(par_name, par_value)
+
+      end
+
+      return params
     end
 
     def puts(*)
