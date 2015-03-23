@@ -5,70 +5,26 @@
 # All information is exchanged using a variation of g-code
 # Parameters are stored in the database
 module Fb
-  class HardwareInterfaceArduino
+  class Arduino
 
-    attr_accessor :serial_port
- 
-    attr_reader :is_busy
-    attr_reader :is_error
-    attr_reader :is_done
-    attr_reader :return_values
+    attr_reader :serial_port, :logger
 
-    # initialize the interface
-    #
-    def initialize(test_mode)
-      @status_debug_msg  = $debug_msg
-      @test_mode         = test_mode      
-
-      # connect to arduino
-      connect_board()
-
-      @external_info     = ""
-      @return_values     = Queue.new
-
-      @is_busy           = false
-      @is_error          = false
-      @is_done           = false
-
-    end
-
-    ## ARDUINO HANLDING
-    ## ****************
-
-    # connect to the serial port and start communicating with the arduino/firmata protocol
-    #
-    def connect_board
-
-      parameters =
-      {
-        "baud"         => 115200,
-        "data_bits"    => 8,
-        "stop_bits"    => 1,
-        "parity"       => SerialPort::NONE,
-        "flow_control" => SerialPort::SOFT
-      }
-
-      comm_port = '/dev/ttyACM0'
-      @serial_port = SerialPort.new(comm_port, parameters) if @test_mode == false
-      @serial_port = SerialPortSim.new(comm_port, parameters) if @test_mode == true
-
+    def initialize(serial_port, logger)
+      @serial_port, @logger = serial_port, logger
     end
 
     # write a command to the robot
     #
     def write_command(text, log, onscreen)
-      begin
+      write_status = create_write_status(text, log, onscreen)
+      write_to_serial(write_status)
 
-        write_status = create_write_status(text, log, onscreen)
-        write_to_serial(write_status)
-        
-        @parameters = []
-        @is_busy    = true
-        @is_error   = false
+      @parameters = []
+      @is_busy    = true
+      @is_error   = false
 
-      rescue => e
-        handle_execution_exception(e)
-      end
+    rescue => e
+      handle_execution_exception(e)
     end
 
     # check the responses from the robot
@@ -108,8 +64,8 @@ module Fb
     def write_to_serial(write_status)
       puts "WR: #{write_status.text}" if write_status.onscreen
       @serial_port.read_timeout = 2
-      clean_serial_buffer() if @test_mode == false
-      serial_port_write( "#{write_status.text}\n" )
+      clean_serial_buffer
+      serial_port.write("#{write_status.text}\n")
     end
 
     # receive all characters coming from the serial port
@@ -177,13 +133,8 @@ module Fb
     # empty the input buffer so no old data is processed
     #
     def clean_serial_buffer
-      while (@serial_port.read(1) != nil)
+      until @serial_port.read(1).nil?
       end
-    end
-
-    # write something to the serial port
-    def serial_port_write(text)
-      @serial_port.write( text )
     end
 
     # if there is an emergency stop, immediately write it to the arduino
@@ -219,7 +170,7 @@ module Fb
       # get all separate parameters from the text
       text.split(' ').each do |param|
 
-        case code 
+        case code
 	when "R81"
           # this is the only code that uses two letter parameters
           par_name  = param[0..1].to_s
