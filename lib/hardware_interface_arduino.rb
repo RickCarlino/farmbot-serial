@@ -7,22 +7,28 @@
 module Fb
   class HardwareInterfaceArduino
 
-    attr_accessor :ramps_param, :ramps_main
-    #attr_accessor :test_serial_read, :test_serial_write
     attr_accessor :serial_port
-    attr_accessor :external_info
+ 
+    attr_reader :is_busy
+    attr_reader :is_error
+    attr_reader :is_done
+    attr_reader :return_values
 
     # initialize the interface
     #
     def initialize(test_mode)
-      @status_debug_msg = $debug_msg
-
-      @test_mode         = test_mode
+      @status_debug_msg  = $debug_msg
+      @test_mode         = test_mode      
 
       # connect to arduino
       connect_board()
 
-      @external_info         = ""
+      @external_info     = ""
+      @return_values     = Queue.new
+
+      @is_busy           = false
+      @is_error          = false
+      @is_done           = false
 
     end
 
@@ -50,31 +56,36 @@ module Fb
 
     # write a command to the robot
     #
-    def execute_command(text, log, onscreen)
+    def write_command(text, log, onscreen)
       begin
 
         write_status = create_write_status(text, log, onscreen)
-
-  #puts @serial_port.test_serial_read
-        prepare_serial_port(write_status)
-  #puts @serial_port.test_serial_read
-
-        # wait until the arduino responds
-        while(write_status.is_busy())
-
-          check_emergency_stop
-          process_feedback(write_status)
-
-        end
-
-        log_result_of_execution(write_status)
+        write_to_serial(write_status)
+        
+        @parameters = []
+        @is_busy    = true
+        @is_error   = false
 
       rescue => e
-  #puts 'exception received'
-  #puts e
         handle_execution_exception(e)
       end
     end
+
+    # check the responses from the robot
+    #
+    def check_command_execution
+      begin
+        if Time.now - write_status.start < write_status.timeout and @is_done == 0
+          @is_error = true
+        else
+          check_emergency_stop
+          process_feedback(write_status)
+        end
+      rescue => e
+        handle_execution_exception(e)
+      end
+    end
+
 
     def create_write_status(text, log, onscreen)
       write_status = Fb::HardwareInterfaceArduinoWriteStatus.new
@@ -89,18 +100,16 @@ module Fb
       puts("ST: serial error\n#{e.message}\n#{e.backtrace.inspect}")
       @serial_port.rts = 1
       connect_board
-      sleep 5 if @test_mode == false
+      @is_error = true
     end
 
-    def log_result_of_execution(write_status)
-
-      # log things if needed
-      if write_status.done == 1
-        puts 'ST: done' if write_status.onscreen
-      else
-        puts 'ST: timeout'
-        sleep 5 if @test_mode == false
-      end
+    # set the serial port ready to send and write the text
+    #
+    def write_to_serial(write_status)
+      puts "WR: #{write_status.text}" if write_status.onscreen
+      @serial_port.read_timeout = 2
+      clean_serial_buffer() if @test_mode == false
+      serial_port_write( "#{write_status.text}\n" )
     end
 
     # receive all characters coming from the serial port
@@ -108,31 +117,24 @@ module Fb
     def process_feedback(write_status)
       i = @serial_port.read(1)
 
-  #print "-#{i}"
-  #print "#{i}"
-
       if i != nil
         i.each_char do |c|
-
-          add_and_process_characters(write_status, c)
-
+          process_characters(write_status, c)
         end
       else
         sleep 0.001 if @test_mode == false
-        #write_status.done = 1 if @test_mode == true
       end
     end
 
     # keep incoming characters in a buffer until it is a complete string
     #
-    def add_and_process_characters(write_status, c)
+    def process_characters(write_status, c)
 
       if c == "\r" or c == "\n"
         if write_status.received.length >= 3
           log_incoming_text(write_status)
           write_status.split_received
           process_code_and_params(write_status)
-
         end
       else
         write_status.received = write_status.received + c
@@ -153,11 +155,11 @@ module Fb
         # command is finished
         when 'R02'
           write_status.done = 1
-
+          @is_done = true
         # command is finished with errors
         when 'R03'
           write_status.done = 1
-
+          @is_done = true
         # command is still ongoing
         when 'R04'
           write_status.start = Time.now
@@ -170,15 +172,6 @@ module Fb
 
       write_status.received = ''
 
-    end
-
-    # set the serial port ready to send
-    #
-    def prepare_serial_port(write_status)
-      puts "WR: #{write_status.text}" if write_status.onscreen
-      @serial_port.read_timeout = 2
-      clean_serial_buffer() if @test_mode == false
-      serial_port_write( "#{write_status.text}\n" )
     end
 
     # empty the input buffer so no old data is processed
@@ -195,10 +188,8 @@ module Fb
 
     # if there is an emergency stop, immediately write it to the arduino
     #
-    def check_emergency_stop
-      if (Fb::HardwareInterface.current.status.emergency_stop)
-       serial_port_write( "E\n" )
-      end
+    def emergency_stop
+     serial_port_write( "E\n" )
     end
 
     # write to log
@@ -211,136 +202,44 @@ module Fb
     #
     def process_value(code,text)
 
-      params = Fb::HardwareInterfaceArduinoValuesReceived.new
+      # get all parameters in the current text
+      return_value = process_value_split(code, text)
 
-      process_value_split(code, params, text)
-
-      # depending on the report code, process the values
-      # this is done by reading parameter names and their values
-      # and respong on it as needed
-
-      process_value_process_param_list(params,code)
-      process_value_process_named_params(params,code)
-      process_value_process_text(code,text)
+      # save the list for the client
+      @return_values << return_value
 
     end
 
-    def process_value_split(code, params, text)
+    def process_value_split(code, text)
+
+      params = Fb::HardwareInterfaceArduinoValuesReceived.new
+      params.code = code
+      params.text = text
 
       # get all separate parameters from the text
       text.split(' ').each do |param|
 
-        if code == "R81"
-         # this is the only code that uses two letter parameters
-          par_code  = param[0..1].to_s
+        case code 
+	when "R81"
+          # this is the only code that uses two letter parameters
+          par_name  = param[0..1].to_s
           par_value = param[2..-1].to_i
         else
-          par_code  = param[0..0].to_s
+          par_name  = param[0..0].to_s
           par_value = param[1..-1].to_i
         end
 
-        params.load_parameter(par_code, par_value)
+        params.load_parameter(par_name, par_value)
 
       end
 
-    end
-
-    def process_value_process_param_list(params,code)
-      #if params.p != 0
-        process_value_R21(params,code)
-        process_value_R23(params,code)
-        process_value_R41(params,code)
-      #end
-    end
-
-
-    # Process report parameter value
-    #
-    def process_value_R21(params,code)
-      if code == 'R21'
-        param = @ramps_param.get_param_by_id(params.p)
-        if param != nil
-          param['value_ar'] = params.v
-        end
-      end
-    end
-
-    # Process report parameter value and save to database
-    #
-    def process_value_R23(params,code)
-      if code == 'R23'
-        param = @ramps_param.get_param_by_id(params.p)
-        if param != nil
-          @ramps_param.save_param_value(params.p, :by_id, :from_db, params.v)
-        end
-      end
-    end
-
-    # Process report pin values
-    #
-    def process_value_R41(params,code)
-      raise 'Not implemented.'
-    end
-
-    def process_value_process_named_params(params,code)
-      process_value_R81(params,code)
-      process_value_R82(params,code)
-    end
-
-    # Process report end stops
-    #
-    def process_value_R81(params,code)
-      if code == 'R81'
-        Fb::HardwareInterface.current.status.info_end_stop_x_a = (params.xa == 1)
-        Fb::HardwareInterface.current.status.info_end_stop_x_b = (params.xb == 1)
-        Fb::HardwareInterface.current.status.info_end_stop_y_a = (params.ya == 1)
-        Fb::HardwareInterface.current.status.info_end_stop_y_b = (params.yb == 1)
-        Fb::HardwareInterface.current.status.info_end_stop_z_a = (params.za == 1)
-        Fb::HardwareInterface.current.status.info_end_stop_z_b = (params.zb == 1)
-      end
-    end
-
-    # Process report position
-    def process_value_R82(params,code)
-      if code == 'R82'
-
-        Fb::HardwareInterface.current.status.info_current_x_steps = params.x
-        Fb::HardwareInterface.current.status.info_current_x       = params.x / @ramps_param.axis_x_steps_per_unit
-
-        Fb::HardwareInterface.current.status.info_current_y_steps = params.y
-        Fb::HardwareInterface.current.status.info_current_y       = params.y / @ramps_param.axis_y_steps_per_unit
-
-        Fb::HardwareInterface.current.status.info_current_z_steps = params.z
-        Fb::HardwareInterface.current.status.info_current_z       = params.z / @ramps_param.axis_z_steps_per_unit
-
-      end
-    end
-
-    def process_value_process_text(code,text)
-      process_value_process_R83(code,text)
-      process_value_process_R99(code,text)
-    end
-
-    # Process report software version
-    #
-    def process_value_process_R83(code,text)
-      if code == 'R83'
-          Fb::HardwareInterface.current.status.device_version = text
-      end
-    end
-
-    # Process report of a debug comment
-    #
-    def process_value_process_R99(code,text)
-      if code == 'R99'
-          puts ">#{text}<"
-      end
+      return params
     end
 
     def puts(*)
       # Too many messages in the test buffer right now. Will delete this later.
       # just disabling it for now.
-      STDOUT.print('╳')
+      STDOUT.print('x')
     end
   end
 end

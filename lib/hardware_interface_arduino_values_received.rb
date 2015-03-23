@@ -1,6 +1,12 @@
 module Fb
   class HardwareInterfaceArduinoValuesReceived
 
+    attr_accessor :code
+    attr_accessor :text
+    attr_accessor :external_info
+
+    # value holders with the name used in the serial 
+    # communucation as they are received from arduino
     attr_accessor :p , :v
     attr_accessor :x , :y , :z
     attr_accessor :xa, :xb
@@ -21,7 +27,8 @@ module Fb
       @yb = 0
       @za = 0
       @zb = 0
-
+      @text = ''
+      @code = 0
     end
 
     def load_parameter(name, value)
