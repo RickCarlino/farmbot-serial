@@ -1,10 +1,8 @@
 ## SERIAL PORT SIMULATION
 ## **********************
-
-# Used for unit tests
-
 module FB
-  class StubSerialPort
+  # Used for unit tests
+  class StubSerialPort # TODO: Inherit from StringIO?
     def initialize(comm_port, parameters)
     end
 

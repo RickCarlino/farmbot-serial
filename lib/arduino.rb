@@ -2,8 +2,6 @@
 ## ******************
 
 # Communicate with the arduino using a serial interface
-# All information is exchanged using a variation of g-code
-# Parameters are stored in the database
 module FB
   class Arduino
     class EmergencyStop < StandardError; end # Not yet used.
