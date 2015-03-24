@@ -6,12 +6,6 @@
 # Parameters are stored in the database
 module FB
   class Arduino
-    class << self
-      def current
-        @current ||= self.new
-      end
-    end
-
     class EmergencyStop < StandardError; end # Not yet used.
 
     attr_reader :serial_port, :logger
