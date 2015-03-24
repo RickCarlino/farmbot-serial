@@ -1,5 +1,7 @@
 # Class that is fed into event machine's event loop to handle incoming serial
 # messages asynchronously. See EM.attach
+require 'event_machine'
+
 module FB
   class ArduinoEventMachine < EventMachine::Connection
     class << self

@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "simplecov"#,  "~> 0.9"
 
   spec.add_runtime_dependency     "serialport"#, "~> 1.3"
+  spec.add_runtime_dependency     "eventmachine"#, "~> 1.3"
 end
