@@ -43,3 +43,4 @@ snippets.rb
 tmp/**/*
 *.rb~
 Gemfile.lock
+idea.rb

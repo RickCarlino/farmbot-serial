@@ -1,21 +1,15 @@
-module Fb
+module FB
+  # Rename to StatusIndicator or StatusRegister
   class HardwareInterfaceArduinoValuesReceived
 
-    attr_accessor :code
-    attr_accessor :text
-    attr_accessor :external_info
+    attr_accessor :code, :text, :external_info
 
-    # value holders with the name used in the serial 
+    # value holders with the name used in the serial
     # communucation as they are received from arduino
-    attr_accessor :p , :v
-    attr_accessor :x , :y , :z
-    attr_accessor :xa, :xb
-    attr_accessor :ya, :yb
-    attr_accessor :za, :zb
+    attr_accessor :p , :v, :x , :y , :z, :xa, :xb, :ya, :yb, :za, :zb
 
 
     def initialize
-
       @p  = -1
       @v  = 0
       @x  = 0
@@ -30,32 +24,34 @@ module Fb
       @text = ''
       @code = 0
     end
-
+    # Change name to []=?
     def load_parameter(name, value)
-
+      name = name.upcase.to_sym
       case name
-        when 'P'
+        when :P
           @p  = value
-        when 'V'
+        when :V
           @v  = value
-        when 'XA'
+        when :XA
           @xa = value
-        when 'XB'
+        when :XB
           @xb = value
-        when 'YA'
+        when :YA
           @ya = value
-        when 'YB'
+        when :YB
           @yb = value
-        when 'ZA'
+        when :ZA
           @za = value
-        when 'ZB'
+        when :ZB
           @zb = value
-        when 'X'
+        when :X
           @x  = value
-        when 'Y'
+        when :Y
           @y  = value
-        when 'Z'
+        when :Z
           @z  = value
+        else
+          raise "Unknown status symbol '#{name}'"
       end
     end
 

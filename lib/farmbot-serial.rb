@@ -1,9 +1,5 @@
 require 'serialport'
-require 'serial_port_sim'
-require 'status'
-require 'arduino_default_params'
-require 'hardware_interface_arduino'
-require 'hardware_interface_param'
-require 'hardware_interface'
-require 'hardware_interface_arduino_values_received'
-require 'hardware_interface_arduino_write_status'
+
+require_relative 'default_serial_port'
+require_relative 'arduino_event_machine'
+require_relative 'arduino'

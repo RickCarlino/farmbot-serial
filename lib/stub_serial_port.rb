@@ -3,7 +3,7 @@
 
 # Used for unit tests
 
-module Fb
+module FB
   class StubSerialPort
     def initialize(comm_port, parameters)
     end

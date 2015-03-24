@@ -1,18 +1,18 @@
 require 'spec_helper'
-describe Fb::HardwareInterfaceArduinoValuesReceived do
+describe FB::HardwareInterfaceArduinoValuesReceived do
 
   before do
 
 
 
 
-    Fb::HardwareInterface.current.status = Fb::Status.new
+    FB::HardwareInterface.current.status = FB::Status.new
 
-    @ramps = Fb::HardwareInterfaceArduinoValuesReceived.new()
+    @ramps = FB::HardwareInterfaceArduinoValuesReceived.new()
 
-    #@ramps = Fb::HardwareInterfaceArduino.new(true)
+    #@ramps = FB::HardwareInterfaceArduino.new(true)
 
-    #@ramps_param = Fb::HardwareInterfaceParam.new
+    #@ramps_param = FB::HardwareInterfaceParam.new
     #@ramps.ramps_param = @ramps_param
 
   end
