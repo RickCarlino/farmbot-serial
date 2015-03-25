@@ -7,7 +7,6 @@ module FB
       attr_accessor :arduino
     end
 
-
     def self.poll(interval, &blk)
       raise 'You must pass a block' unless block_given?
       EventMachine::PeriodicTimer.new(interval.to_f, &blk)
@@ -15,7 +14,7 @@ module FB
 
     # Gets called when data arrives.
     def receive_data(data)
-      self.class.arduino.read(data)
+      self.class.arduino.queue.push(data)
     end
 
     # Gets called when the connection breaks.
@@ -24,16 +23,9 @@ module FB
       EM.stop
     end
 
-    # def self.start(arduino)
-    #   @arduino = arduino
-    #   EM.run do
-    #     EM.attach arduino.serial_port, self
-    #     if @polling_callback
-    #       EventMachine::PeriodicTimer.new(@polling_interval) do
-    #         @polling_callback.call(@arduino)
-    #       end
-    #     end
-    #   end
-    # end
+    def self.connect(arduino)
+      @arduino = arduino
+      EM.attach arduino.serial_port, self
+    end
   end
 end
