@@ -1,5 +1,5 @@
 require 'serialport'
-require_relative 'hardware_interface_arduino_values_received'
 require_relative 'default_serial_port'
+require_relative 'arduino_command_set'
 require_relative 'arduino_event_machine'
 require_relative 'arduino'

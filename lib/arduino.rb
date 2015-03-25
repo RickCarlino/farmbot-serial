@@ -6,13 +6,14 @@ module FB
   class Arduino
     class EmergencyStop < StandardError; end # Not yet used.
 
-    attr_reader :serial_port, :logger
+    attr_reader :serial_port, :logger, :commands
 
     # Initial and provide a serial object, as well as an IO object to send
     # log messages to. Default SerialPort is DefaultSerialPort. Default logger
     # is STDOUT
     def initialize(serial_port = DefaultSerialPort.new, logger = STDOUT)
       @serial_port, @logger = serial_port, logger
+      @commands = FB::ArduinoCommandSet.new(self)
     end
 
     # Log to screen/file/IO stream
