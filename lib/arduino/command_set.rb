@@ -12,8 +12,12 @@ module FB
       bot.write("E")
     end
 
-    def move_relative(x, y, z)
-      bot.write("G00 X#{x} Y#{y} Z#{z}")
+    def move_relative(x, y, z, s = bot.status[:S])
+      x = bot.status[:X] + x
+      y = bot.status[:Y] + y
+      z = bot.status[:Z] + z
+      bot.write("G00 X#{x} Y#{y} Z#{z} S#{s}")
     end
+
   end
 end
