@@ -36,7 +36,9 @@ module FB
     # Send outgoing test to arduino from pi
     def write(string)
       serial_port.puts string
-      log "SENT #{string}"
+      log "SENT
+#{string}
+/SENT"
     end
 
     # Handle loss of serial connection

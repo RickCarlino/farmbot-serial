@@ -1,0 +1,21 @@
+---
+X: :x_movement
+Y: :y_movement
+Z: :z_movement
+S: :speed
+Q: :quanity
+T: :time
+C: :comment
+P: :parameter
+V: :value_number
+W: :secondary_value
+L: :number
+E: :element
+M: :pin_mode
+M: :read_write_mode
+XA: :end_stop_1_x_axis
+XB: :end_stop_2_x_axis
+YA: :end_stop_1_y_axis
+YB: :end_stop_2_y_axis
+ZA: :end_stop_1_z_axis
+ZB: :end_stop_2_z_axis
