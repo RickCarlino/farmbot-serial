@@ -12,9 +12,13 @@ module FB
       EventMachine::PeriodicTimer.new(interval.to_f, &blk)
     end
 
+    def initialize
+      @q = self.class.arduino.queue
+    end
+
     # Gets called when data arrives.
     def receive_data(data)
-      self.class.arduino.queue.push(data)
+      @q.push(data)
     end
 
     # Gets called when the connection breaks.

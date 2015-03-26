@@ -1,5 +1,3 @@
-require 'forwardable'
-
 module FB
   class Status
     # Map of informational status and default values for status within Arduino.
