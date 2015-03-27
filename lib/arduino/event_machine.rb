@@ -8,7 +8,6 @@ module FB
     end
 
     def self.poll(interval, &blk)
-      raise 'You must pass a block' unless block_given?
       EventMachine::PeriodicTimer.new(interval.to_f, &blk)
     end
 
@@ -29,6 +28,13 @@ module FB
       end
     end
 
+    # This is a nasty hack that takes incoming strings from the serial line and
+    # splits the data on \r\n. Unlike Ruby's split() method, this method will
+    # preserve the \r\n.
+    def split_into_chunks(data)
+      data.gsub("\r\n", '!@').split('@').map{ |d| d.gsub('!', "\r\n") }
+    end
+
     def clear_buffer
       @buffer = ''
     end
@@ -39,10 +45,6 @@ module FB
 
     def send_buffer
       @q << Gcode.parse_lines(@buffer)
-    end
-
-    def split_into_chunks(data)
-      data.gsub("\r\n", '!@').split('@').map{ |d| d.gsub('!', "\r\n") }
     end
 
     # Gets called when the connection breaks.

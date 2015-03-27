@@ -8,16 +8,32 @@ module FB
       @bot = bot
     end
 
-    def emergency_stop
+    def execute(gcode)
+      puts "SERIAL OUT: #{gcode.name}"
+      self.send(gcode.name, gcode)
+    end
+
+    def emergency_stop(*)
       bot.write("E")
     end
 
-    def move_relative(x, y, z, s = bot.status[:S])
-      x = bot.status[:X] + x
-      y = bot.status[:Y] + y
-      z = bot.status[:Z] + z
-      bot.write("G00 X#{x} Y#{y} Z#{z} S#{s}")
+    def move_relative(gcode)
     end
 
+    def received(gcode)
+    end
+
+    def reporting_end_stops(gcode)
+    end
+
+    def report_current_position(gcode)
+    end
+
+    def done(gcode)
+    end
+
+    def report_status_value(gcode)
+    end
   end
 end
+

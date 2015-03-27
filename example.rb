@@ -1,14 +1,6 @@
-# Farmbot-Serial
+require_relative 'lib/farmbot-serial'
+require 'pry'
 
-A ruby gem for controlling Farmbot via serial line with EventMachine.
-
-## Usage
-
-```
-gem install farmbot-serial, '0.0.5'
-```
-
-```ruby
 bot = FB::Arduino.new # Defaults to '/dev/ttyACM0', can be configured.
 
 EM.run do
@@ -27,4 +19,3 @@ EM.run do
   # Try pulling the USB cable out to test this one.
   bot.onclose { EM.stop }
 end
-```

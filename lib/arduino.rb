@@ -23,10 +23,21 @@ module FB
       logger.puts(message)
     end
 
+    # Highest priority message when processing incoming Gcode. Use for system
+    # level status changes.
+    def parse_incoming(gcode)
+      commands.execute(gcode)
+    end
+
     # Handle incoming text from arduino into pi
     def onmessage(&blk)
       raise 'read() requires a block' unless block_given?
-      @queue.subscribe { |string| blk.call(string) }
+      @queue.subscribe do |gcodes|
+        gcodes.each do |gcode|
+          parse_incoming(gcode)
+          blk.call(gcode)
+        end
+      end
     end
 
     def onclose(&blk)
@@ -42,9 +53,6 @@ module FB
     def disconnect
       log "Connection to device lost"
       @onclose.call if @onclose
-    end
-
-    def reconnect
     end
   end
 end
