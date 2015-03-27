@@ -13,12 +13,36 @@ module FB
     end
 
     def initialize
-      @q = self.class.arduino.queue
+      @q, @buffer = self.class.arduino.queue, ''
     end
 
     # Gets called when data arrives.
     def receive_data(data)
-      @q.push(data)
+      split_into_chunks(data).each do |chunk|
+        if chunk.end_with?("\r\n")
+          add_to_buffer(chunk)
+          send_buffer
+          clear_buffer
+        else
+          add_to_buffer(chunk)
+        end
+      end
+    end
+
+    def clear_buffer
+      @buffer = ''
+    end
+
+    def add_to_buffer(d)
+      @buffer += d
+    end
+
+    def send_buffer
+      @q << Gcode.parse_lines(@buffer)
+    end
+
+    def split_into_chunks(data)
+      data.gsub("\r\n", '!@').split('@').map{ |d| d.gsub('!', "\r\n") }
     end
 
     # Gets called when the connection breaks.

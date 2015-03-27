@@ -14,7 +14,7 @@ module FB
     # log messages to. Default SerialPort is DefaultSerialPort. Default logger
     # is STDOUT
     def initialize(serial_port = DefaultSerialPort.new, logger = STDOUT)
-      @serial_port, @logger, @queue = serial_port, logger, EM::Queue.new
+      @serial_port, @logger, @queue = serial_port, logger, EM::Channel.new
       @commands, @status = FB::ArduinoCommandSet.new(self), FB::Status.new(self)
     end
 
@@ -26,7 +26,7 @@ module FB
     # Handle incoming text from arduino into pi
     def onmessage(&blk)
       raise 'read() requires a block' unless block_given?
-      @queue.pop { |string| blk.call(string) }
+      @queue.subscribe { |string| blk.call(string) }
     end
 
     def onclose(&blk)
@@ -36,9 +36,6 @@ module FB
     # Send outgoing test to arduino from pi
     def write(string)
       serial_port.puts string
-      log "SENT
-#{string}
-/SENT"
     end
 
     # Handle loss of serial connection
