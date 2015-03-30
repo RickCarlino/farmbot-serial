@@ -28,3 +28,13 @@ EM.run do
   bot.onclose { EM.stop }
 end
 ```
+
+# Upgrading to Ruby 2.2
+
+This gem requires Ruby 2.2. As of this writing, a Pi is loaded with 1.9.3 by default.
+
+To upgrade your ruby version, try this:
+
+```
+ curl -L https://get.rvm.io | bash -s stable --ruby
+```

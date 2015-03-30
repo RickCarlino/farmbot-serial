@@ -26,10 +26,10 @@
 :F82: :report_current_position
 :F83: :report_software_version
 :E:   :emergency_stop
-:R01: :received
-:R02: :done
-:R03: :error
-:R04: :busy
+:R1: :received
+:R2: :done
+:R3: :error
+:R4: :busy
 :R21: :report_parameter_value
 :R31: :report_status_value
 :R41: :report_pin_value

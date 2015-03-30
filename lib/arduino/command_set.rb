@@ -31,6 +31,7 @@ module FB
     end
 
     def reporting_end_stops(gcode)
+      bot.status.gcode_update(gcode)
     end
 
     def report_current_position(gcode)
@@ -42,6 +43,7 @@ module FB
     end
 
     def report_status_value(gcode)
+      bot.status.gcode_update(gcode)
     end
   end
 end

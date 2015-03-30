@@ -33,6 +33,8 @@ module FB
       def initialize(str)
         nodes = str.scan(/\d+|\D+/) # ["R", "01"]
         @head, @tail = nodes.shift.to_sym, nodes.join(" ")
+        # Coerce to ints if possible, since serial line is all string types.
+        @tail = @tail.to_i if @tail.match(/^\d+$/)
       end
 
       def to_sym
