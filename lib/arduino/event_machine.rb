@@ -32,7 +32,7 @@ module FB
     # splits the data on \r\n. Unlike Ruby's split() method, this method will
     # preserve the \r\n.
     def split_into_chunks(data)
-      data.gsub("\r\n", '!@').split('@').map{ |d| d.gsub('!', "\r\n") }
+      data.gsub("\r\n", '\b\a').split('\a').map{ |d| d.gsub('\b', "\r\n") }
     end
 
     def clear_buffer

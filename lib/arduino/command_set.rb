@@ -4,12 +4,14 @@ module FB
   class ArduinoCommandSet
     attr_reader :bot
 
+    class UnhandledGcode < StandardError; end
+
     def initialize(bot)
       @bot = bot
     end
 
     def execute(gcode)
-      puts "SERIAL OUT: #{gcode.name}"
+      puts "Pi -> Arduino: #{gcode.name}"
       self.send(gcode.name, gcode)
     end
 
@@ -18,6 +20,11 @@ module FB
     end
 
     def move_relative(gcode)
+      bot.write(gcode.to_s)
+    end
+
+    def unknown(gcode)
+      raise UnhandledGcode, "Dont know how to parse '#{gcode.to_s}'"
     end
 
     def received(gcode)
