@@ -11,7 +11,7 @@ module FB
 
     attr_reader :serial_port, :logger, :commands, :queue, :status, :inputs
 
-    # Initial and provide a serial object, as well as an IO object to send
+    # Initialize and provide a serial object, as well as an IO object to send
     # log messages to. Default SerialPort is DefaultSerialPort. Default logger
     # is STDOUT
     def initialize(serial_port = DefaultSerialPort.new, logger = STDOUT)

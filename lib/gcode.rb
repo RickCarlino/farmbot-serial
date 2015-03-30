@@ -8,7 +8,7 @@ module FB
     def initialize(str)
       @str = str
       @params = str.split(' ').map{|line| GcodeToken.new(line)}
-      @cmd = @params.shift
+      @cmd = @params.shift || 'NULL'
     end
 
     # Turns a string of many gcodes into an array of many gcodes. Used to parse
