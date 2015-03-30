@@ -1,6 +1,7 @@
 require 'serialport'
 require_relative 'default_serial_port'
-require_relative 'arduino/command_set'
+require_relative 'arduino/incoming_handler'
+require_relative 'arduino/outgoing_handler'
 require_relative 'arduino/event_machine'
 require_relative 'arduino/status'
 # Communicate with the arduino using a serial interface
@@ -8,14 +9,18 @@ module FB
   class Arduino
     class EmergencyStop < StandardError; end # Not yet used.
 
-    attr_reader :serial_port, :logger, :commands, :queue, :status
+    attr_reader :serial_port, :logger, :commands, :queue, :status, :inputs
 
     # Initial and provide a serial object, as well as an IO object to send
     # log messages to. Default SerialPort is DefaultSerialPort. Default logger
     # is STDOUT
     def initialize(serial_port = DefaultSerialPort.new, logger = STDOUT)
-      @serial_port, @logger, @queue = serial_port, logger, EM::Channel.new
-      @commands, @status = FB::ArduinoCommandSet.new(self), FB::Status.new(self)
+      @serial_port = serial_port
+      @logger      = logger
+      @queue       = EM::Channel.new
+      @commands    = FB::OutgoingHandler.new(self)
+      @inputs      = FB::IncomingHandler.new(self)
+      @status      = FB::Status.new(self)
     end
 
     # Log to screen/file/IO stream
@@ -27,7 +32,7 @@ module FB
     # level status changes.
     def parse_incoming(gcode)
       log "Pi <- Arduino: #{gcode.name}"
-      commands.execute(gcode)
+      inputs.execute(gcode)
     end
 
     # Handle incoming text from arduino into pi

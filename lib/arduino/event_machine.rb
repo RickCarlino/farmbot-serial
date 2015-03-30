@@ -23,7 +23,7 @@ module FB
           send_buffer
           clear_buffer
         else
-          add_to_buffer(chunk)
+          add_to_buffer(chunk) # Keep RXing the buffer until chunk completes.
         end
       end
     end

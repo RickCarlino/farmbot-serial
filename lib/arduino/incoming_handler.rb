@@ -1,7 +1,6 @@
 module FB
-  # Composes all logic related to controlling a bot into a single object.
-  # Responsible for writing to the serial line.
-  class ArduinoCommandSet
+  # Handles Gcode that moves from the Arduino to the Pi (Arduino -> Pi).
+  class IncomingHandler
     attr_reader :bot
 
     class UnhandledGcode < StandardError; end
@@ -12,14 +11,6 @@ module FB
 
     def execute(gcode)
       self.send(gcode.name, gcode)
-    end
-
-    def emergency_stop(*)
-      bot.write("E")
-    end
-
-    def move_relative(gcode)
-      bot.write(gcode.to_s)
     end
 
     def unknown(gcode)
@@ -47,4 +38,3 @@ module FB
     end
   end
 end
-
