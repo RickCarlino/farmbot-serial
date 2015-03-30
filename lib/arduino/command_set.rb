@@ -11,7 +11,6 @@ module FB
     end
 
     def execute(gcode)
-      puts "Pi -> Arduino: #{gcode.name}"
       self.send(gcode.name, gcode)
     end
 
@@ -28,15 +27,18 @@ module FB
     end
 
     def received(gcode)
+      bot.status[:busy] = 1
     end
 
     def reporting_end_stops(gcode)
     end
 
     def report_current_position(gcode)
+      bot.status.gcode_update(gcode)
     end
 
     def done(gcode)
+      bot.status[:busy] = 0
     end
 
     def report_status_value(gcode)

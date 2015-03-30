@@ -26,6 +26,7 @@ module FB
     # Highest priority message when processing incoming Gcode. Use for system
     # level status changes.
     def parse_incoming(gcode)
+      log "Pi <- Arduino: #{gcode.name}"
       commands.execute(gcode)
     end
 
@@ -46,6 +47,7 @@ module FB
 
     # Send outgoing test to arduino from pi
     def write(string)
+      log "Pi -> Arduino: #{string.name}" if string.is_a?(FB::Gcode)
       serial_port.puts string
     end
 

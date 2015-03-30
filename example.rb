@@ -14,7 +14,7 @@ EM.run do
   EventMachine::PeriodicTimer.new(2.5) { bot.write(FB::Gcode.new "F31 P8") }
 
   # This will execute after status has been updated / internal code.
-  bot.onmessage { |gcode| puts "Pi <- Arduino: #{gcode.name}" }
+  bot.onmessage { |gcode| gcode }
 
   # Try pulling the USB cable out to test this one.
   bot.onclose { EM.stop }
