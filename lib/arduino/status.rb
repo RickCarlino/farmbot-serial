@@ -5,14 +5,14 @@ module FB
                     W: 0, L: 0, E: 0, M: 0, XA: 0, XB: 0, YA: 0, YB: 0, ZA: 0,
                    ZB: 0,YR: 0, R: 0, BUSY: 1}
     # Put it into a struct.
-    Info = Struct.new(*DEFAULT_INFO.keys) do
-      def to_h
-        # So here's the deal: Ruby 2.2.0 has a to_h method, but raspbian ships
-        # with 1.9.3 by default. Compiling 2.2.0 on a pi takes HOURS, so I am
-        # going to reinvent the wheel in the name of saving users installation
-        # time.
-        Hash[each_pair.to_a]
-      end
+    Info = Struct.new(*DEFAULT_INFO.keys)# do
+      # def to_h
+      #   # So here's the deal: Ruby 2.2.0 has a to_h method, but raspbian ships
+      #   # with 1.9.3 by default. Compiling 2.2.0 on a pi takes HOURS, so I am
+      #   # going to reinvent the wheel in the name of saving users installation
+      #   # time.
+      #   Hash[each_pair.to_a]
+      # end
     end
 
     attr_reader :bot

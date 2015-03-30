@@ -38,3 +38,5 @@ To upgrade your ruby version, try this:
 ```
  curl -L https://get.rvm.io | bash -s stable --ruby
 ```
+
+This will take about 2 hours on a standard pi.
