@@ -22,6 +22,10 @@ module FB
       GCODE_DICTIONARY[cmd.to_sym] || :unknown
     end
 
+    def to_s
+      [@cmd, *@params].map(&:to_s).reduce("", :+).strip
+    end
+
     # A head/tail pair of a single node of GCode. Ex: R01 = [:R, '01']
     class GcodeToken
       attr_reader :head, :tail, :name
@@ -32,7 +36,11 @@ module FB
       end
 
       def to_sym
-        "#{head}#{tail}".to_sym
+        to_s.to_sym
+      end
+
+      def to_s
+        "#{head}#{tail} "
       end
     end
   end

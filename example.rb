@@ -7,7 +7,7 @@ EM.run do
   FB::ArduinoEventMachine.connect(bot)
 
   # Example 1: Writing to the serial line the "correct way" every 1.5 seconds.
-  command = FB::Gcode.new('G01 X01 Y01 Z01')
+  command = FB::Gcode.new('G01 X250 Y250 Z250')
   EventMachine::PeriodicTimer.new(1.5) { bot.commands.move_relative(command) }
 
   # Example 2: Writing raw strings to serial every 2.5
@@ -19,3 +19,4 @@ EM.run do
   # Try pulling the USB cable out to test this one.
   bot.onclose { EM.stop }
 end
+

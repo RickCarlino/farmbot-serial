@@ -18,6 +18,7 @@ module FB
     end
 
     def move_relative(gcode)
+      bot.write(gcode.to_s)
     end
 
     def received(gcode)
