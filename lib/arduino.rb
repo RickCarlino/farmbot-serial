@@ -21,6 +21,7 @@ module FB
       @commands    = FB::OutgoingHandler.new(self)
       @inputs      = FB::IncomingHandler.new(self)
       @status      = FB::Status.new(self)
+      status.onchange { |diff| puts diff }
     end
 
     # Log to screen/file/IO stream

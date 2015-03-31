@@ -9,6 +9,7 @@ module FB
     attr_reader :bot
 
     def initialize(bot)
+      @changes = EM::Channel.new
       @bot, @info = bot, Info.new(*DEFAULT_INFO.values)
     end
 
@@ -32,10 +33,18 @@ module FB
       end
     end
 
+    def onchange
+      @changes.subscribe { |diff| yield(diff) }
+    end
+
+    def ready?
+      self[:BUSY] == 0
+    end
+
     def emit_updates(old)
       # calculate a diff between the old status and new status
-      changes = (@info.to_h.to_a - old.to_a).to_h
-      bot.log "STATUS UPDATE: #{changes}" unless changes.empty?
+      diff = (@info.to_h.to_a - old.to_a).to_h
+      @changes << diff unless diff.empty?
     end
   end
 end

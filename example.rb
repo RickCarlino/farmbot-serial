@@ -12,7 +12,7 @@ EM.run do
   end
 
   # Example 2: Writing raw gcode object to serial every 2.5
-  EventMachine::PeriodicTimer.new(2.5) { bot.write FB::Gcode.new("F31 P8") }
+  EventMachine::PeriodicTimer.new(2.5) { bot.write(FB::Gcode.new("F31 P8")) }
 
   # This will execute after status has been updated / internal code.
   bot.onmessage { |gcode| puts "Message just came in." }
