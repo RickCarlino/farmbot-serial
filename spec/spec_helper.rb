@@ -5,6 +5,6 @@ SimpleCov.start do
 end
 require 'pry'
 require 'farmbot-serial'
-
+require_relative 'fixtures/stub_serial_port'
 RSpec.configure do |config|
 end

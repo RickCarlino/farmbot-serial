@@ -7,8 +7,8 @@ EM.run do
   FB::ArduinoEventMachine.connect(bot)
 
   # Example 1: Writing to the serial line the "correct way" every 1.5 seconds.
-  EventMachine::PeriodicTimer.new(1.5) do
-    bot.commands.move_relative(x: 100, y: 50)
+  EventMachine::PeriodicTimer.new(2) do
+    bot.commands.move_relative(x: 300, y: 100)
   end
 
   # Example 2: Writing raw gcode object to serial every 2.5
