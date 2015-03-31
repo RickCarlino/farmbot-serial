@@ -15,7 +15,7 @@ module FB
     end
 
     def move_relative(x: 0, y: 0, z: 0, s: 100)
-      bot.write(FB::Gcode.new('G00 X#{x} Y#{y} Z#{z} S#{s}'))
+      bot.write(FB::Gcode.new("G00 X#{x} Y#{y} Z#{z}"))
     end
 
   end
