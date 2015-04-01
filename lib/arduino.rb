@@ -58,18 +58,15 @@ module FB
     end
 
     def execute_command_next_tick
-      @tick_count ||= 0
       EM.next_tick do
         if status.ready?
           diff = (Time.now - (@time || Time.now)).to_i
           puts "Executing #{@outgoing.count} jobs after #{diff} sconds."
           serial_port.puts @outgoing.pop
           @time = nil
-          @tick_count = 0
         else
           @time ||= Time.now
-          @tick_count += 1
-          serial_port.puts "F31 P8" if (@tick_count % 100) == 0
+          serial_port.puts "F31 P8"
           execute_command_next_tick
         end
       end
