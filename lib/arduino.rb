@@ -75,7 +75,7 @@ module FB
           @time = nil
         else
           @time ||= Time.now
-          serial_port.puts "F82"
+          serial_port.puts "F31 P8"
           execute_command_next_tick
         end
       end

@@ -8,7 +8,8 @@ FARMBOT SERIAL SANDBOX. WELCOME!
 ================================"""
 $commands = {
   "q" => "bot.commands.emergency_stop",
-  "w" => "bot.commands.move_relative(x: 200)",
+  "w" => "bot.commands.move_relative(x: 600)",
+  "s" => "bot.commands.move_relative(x: -600)",
   "e" => "bot.commands.home_x",
   "r" => "bot.commands.home_y",
   "t" => "bot.commands.home_z",
