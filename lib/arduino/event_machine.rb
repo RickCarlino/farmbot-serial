@@ -9,7 +9,7 @@ module FB
 
     def initialize
       @bot = self.class.arduino
-      @q, @buffer = @bot.queue, ''
+      @q, @buffer = @bot.inbound_queue, ''
     end
 
     # Gets called when data arrives.
@@ -41,7 +41,6 @@ module FB
     end
 
     def send_buffer
-      print "IN "
       @q << Gcode.parse_lines(@buffer)
     end
 

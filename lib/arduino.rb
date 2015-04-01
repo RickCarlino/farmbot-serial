@@ -9,20 +9,23 @@ module FB
   class Arduino
     class EmergencyStop < StandardError; end # Not yet used.
 
-    attr_reader :serial_port, :logger, :commands, :queue, :status, :inputs
+    attr_reader :serial_port, :logger, :commands, :inbound_queue, :status,
+      :inputs
 
     # Initialize and provide a serial object, as well as an IO object to send
     # log messages to. Default SerialPort is DefaultSerialPort. Default logger
     # is STDOUT
     def initialize(serial_port = DefaultSerialPort.new, logger = STDOUT)
+      @outbound_queue = [] # Pi -> Arduino
+      @inbound_queue  = EM::Channel.new # Pi <- Arduino
+
       @serial_port = serial_port
       @logger      = logger
-      @outgoing    = []
-      @queue       = EM::Channel.new
       @commands    = FB::OutgoingHandler.new(self)
       @inputs      = FB::IncomingHandler.new(self)
       @status      = FB::Status.new(self)
-      status.onchange { |diff| log diff }
+
+      start_event_listeners
     end
 
     # Log to screen/file/IO stream
@@ -30,30 +33,31 @@ module FB
       logger.puts(message)
     end
 
-    # Highest priority message when processing incoming Gcode. Use for system
-    # level status changes.
-    def parse_incoming(gcode)
-      inputs.execute(gcode)
+    # Send outgoing test to arduino from pi
+    def write(string)
+      @outbound_queue.unshift string
+      execute_command_next_tick
+    end
+
+    def onchange(&blk)
+      @onchange = blk
     end
 
     # Handle incoming text from arduino into pi
     def onmessage(&blk)
-      @queue.subscribe do |gcodes|
-        gcodes.each do |gcode|
-          parse_incoming(gcode)
-          yield(gcode)
-        end
-      end
+      @onmessage = blk
     end
 
     def onclose(&blk)
       @onclose = blk
     end
 
-    # Send outgoing test to arduino from pi
-    def write(string)
-      @outgoing.unshift string
-      execute_command_next_tick
+    private
+
+    # Highest priority message when processing incoming Gcode. Use for system
+    # level status changes.
+    def parse_incoming(gcode)
+      inputs.execute(gcode)
     end
 
     def execute_command_next_tick
@@ -61,7 +65,7 @@ module FB
         if status.ready?
           diff = (Time.now - (@time || Time.now)).to_i
           log "Sending queue after #{diff}s delay" if diff > 0
-          serial_port.puts @outgoing.pop
+          serial_port.puts @outbound_queue.pop
           @time = nil
         else
           @time ||= Time.now
@@ -75,6 +79,16 @@ module FB
     def disconnect
       log "Connection to device lost"
       @onclose.call if @onclose
+    end
+
+    def start_event_listeners
+      status.onchange { |diff| @onchange.call(diff) if @onchange }
+      inbound_queue.subscribe do |gcodes|
+        gcodes.each do |gcode|
+          parse_incoming(gcode)
+          @onmessage.call(gcode) if @onmessage
+        end
+      end
     end
   end
 end

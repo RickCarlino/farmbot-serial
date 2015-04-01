@@ -7,15 +7,12 @@ EM.run do
   FB::ArduinoEventMachine.connect(bot)
 
   # Example 1: Writing to the serial line the "correct way" every 1.5 seconds.
-  EventMachine::PeriodicTimer.new(2) do
-    bot.commands.move_relative(x: 300, y: 100)
-  end
+  EventMachine::PeriodicTimer.new(2) { bot.commands.move_relative(x: 300) }
 
   EventMachine::PeriodicTimer.new(2) { bot.write(FB::Gcode.new("F31 P8")) }
-  # This will execute after status has been updated / internal code.
-  bot.onmessage { |gcode| nil }
 
-  # Try pulling the USB cable out to test this one.
-  bot.onclose { puts "bye!"; EM.stop }
+  bot.onmessage { |gcode| bot.log "Got #{gcode}" }
+  bot.onchange { |diff| bot.log "Status Changed: #{diff}" }
+  bot.onclose { puts "bye!"; EM.stop } # Unplug the bot and see!
 end
 
