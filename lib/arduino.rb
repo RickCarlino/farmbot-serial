@@ -17,11 +17,12 @@ module FB
     def initialize(serial_port = DefaultSerialPort.new, logger = STDOUT)
       @serial_port = serial_port
       @logger      = logger
+      @outgoing    = []
       @queue       = EM::Channel.new
       @commands    = FB::OutgoingHandler.new(self)
       @inputs      = FB::IncomingHandler.new(self)
       @status      = FB::Status.new(self)
-      status.onchange { |diff| puts diff }
+      status.onchange { |diff| nil }
     end
 
     # Log to screen/file/IO stream
@@ -32,7 +33,6 @@ module FB
     # Highest priority message when processing incoming Gcode. Use for system
     # level status changes.
     def parse_incoming(gcode)
-      log "Pi <- Arduino: #{gcode.name}"
       inputs.execute(gcode)
     end
 
@@ -53,8 +53,28 @@ module FB
 
     # Send outgoing test to arduino from pi
     def write(string)
-      log "Pi -> Arduino: #{string.name}" if string.is_a?(FB::Gcode)
-      serial_port.puts string
+      @outgoing.unshift string
+      execute_command_next_tick
+    end
+
+    def execute_command_next_tick
+      @tick_count ||= 0
+      EM.next_tick do
+        if status.ready?
+          diff = (Time.now - (@time || Time.now)).to_i
+          puts "Executing #{@outgoing.count} jobs after #{diff} sconds."
+          serial_port.puts @outgoing.pop
+          @time = nil
+          @tick_count = 0
+        else
+          @time ||= Time.now
+          @tick_count += 1
+          serial_port.puts "F31 P8" if (@tick_count % 100) == 0
+          execute_command_next_tick
+        end
+      end
+    rescue
+      binding.pry
     end
 
     # Handle loss of serial connection

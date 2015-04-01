@@ -36,5 +36,9 @@ module FB
     def report_status_value(gcode)
       bot.status.gcode_update(gcode)
     end
+
+    def report_software_version(gcode)
+      nil # Don't need the info right now.
+    end
   end
 end
