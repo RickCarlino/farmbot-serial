@@ -11,6 +11,7 @@ module FB
     end
 
     def emergency_stop(*)
+      bot.outbound_queue = []  # Dump pending commands.
       bot.serial_port.puts "E" # Don't queue this one- write to serial line.
     end
 

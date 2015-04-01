@@ -11,11 +11,11 @@ module FB
 
     def execute(gcode)
       self.send(gcode.name, gcode)
+    rescue NoMethodError
+      bot.log "#{gcode.name} is a valid GCode, but no input handler method exists"
     end
 
     def unknown(gcode)
-      raise UnhandledGcode, "Dont know how to parse '#{gcode.to_s}'"
-    rescue => e
       bot.log "Don't know how to parse incoming GCode: #{gcode}"
     end
 
@@ -33,6 +33,10 @@ module FB
 
     def done(gcode)
       bot.status[:busy] = 0
+    end
+
+    def busy(gcode)
+      bot.status[:busy] = 1
     end
 
     def report_status_value(gcode)

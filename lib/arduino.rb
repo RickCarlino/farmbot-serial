@@ -10,13 +10,13 @@ module FB
     class EmergencyStop < StandardError; end # Not yet used.
 
     attr_reader :serial_port, :logger, :commands, :inbound_queue, :status,
-      :inputs
+      :inputs, :outbound_queue
 
     # Initialize and provide a serial object, as well as an IO object to send
     # log messages to. Default SerialPort is DefaultSerialPort. Default logger
     # is STDOUT
-    def initialize(serial_port = DefaultSerialPort.new, logger = STDOUT)
-      @outbound_queue = [] # Pi -> Arduino
+    def initialize(serial_port: DefaultSerialPort.new, logger: STDOUT)
+      @outbound_queue = [] # Pi -> Arduino Gcode
       @inbound_queue  = EM::Channel.new # Pi <- Arduino
 
       @serial_port = serial_port
