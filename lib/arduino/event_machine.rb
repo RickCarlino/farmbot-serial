@@ -10,7 +10,6 @@ module FB
     def initialize
       @bot = self.class.arduino
       @q, @buffer = @bot.queue, ''
-      EventMachine::PeriodicTimer.new(2) { @bot.serial_port.puts "F83" }
     end
 
     # Gets called when data arrives.

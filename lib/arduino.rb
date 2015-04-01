@@ -38,11 +38,10 @@ module FB
 
     # Handle incoming text from arduino into pi
     def onmessage(&blk)
-      raise 'read() requires a block' unless block_given?
       @queue.subscribe do |gcodes|
         gcodes.each do |gcode|
           parse_incoming(gcode)
-          blk.call(gcode)
+          yield(gcode)
         end
       end
     end
