@@ -3,16 +3,46 @@ require 'pry'
 
 bot = FB::Arduino.new # Defaults to '/dev/ttyACM0', can be configured.
 
+puts """
+FARMBOT SERIAL SANDBOX. WELCOME!
+================================"""
+$commands = {
+  "q" => "bot.commands.emergency_stop",
+  "w" => "bot.commands.move_relative(x: 200)",
+  "e" => "bot.commands.home_x",
+  "r" => "bot.commands.home_y",
+  "t" => "bot.commands.home_z",
+  "y" => "bot.commands.home_all",
+  "u" => "bot.commands.read_parameter(8)",
+  "i" => "bot.commands.write_parameter",
+  "p" => "bot.commands.read_status(8)",
+}
+
+$commands.each { |k, v| puts "#{k}: #{v}" }
+
+class KeyboardHandler < EM::Connection
+  include EM::Protocols::LineText2
+
+  attr_reader :bot
+
+  def initialize(bot)
+    @bot = bot
+  end
+
+  def receive_line(data)
+    cmd = $commands[data] || ""
+    eval(cmd)
+  end
+end
+
+puts "Starting now."
+
 EM.run do
   FB::ArduinoEventMachine.connect(bot)
-
-  # Example 1: Writing to the serial line the "correct way" every 1.5 seconds.
-  EventMachine::PeriodicTimer.new(2) { bot.commands.move_relative(x: 300) }
-
-  EventMachine::PeriodicTimer.new(2) { bot.write(FB::Gcode.new("F31 P8")) }
-
-  bot.onmessage { |gcode| bot.log "Got #{gcode}" }
-  bot.onchange { |diff| bot.log "Status Changed: #{diff}" }
-  bot.onclose { puts "bye!"; EM.stop } # Unplug the bot and see!
+  bot.onmessage { |gcode| print "#{gcode.name}; " }
+  bot.onchange { |diff| print "#{diff}; " }
+  bot.onclose { puts "bye!"; EM.stop } # Unplug the bot and see
+  # EventMachine::PeriodicTimer.new(2) { bot.serial_port.puts "G82" }
+  EM.open_keyboard(KeyboardHandler, bot)
 end
 

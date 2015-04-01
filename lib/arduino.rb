@@ -52,6 +52,12 @@ module FB
       @onclose = blk
     end
 
+    # Handle loss of serial connection
+    def disconnect
+      log "Connection to device lost"
+      @onclose.call if @onclose
+    end
+
     private
 
     # Highest priority message when processing incoming Gcode. Use for system
@@ -69,16 +75,10 @@ module FB
           @time = nil
         else
           @time ||= Time.now
-          serial_port.puts "F83"
+          serial_port.puts "F82"
           execute_command_next_tick
         end
       end
-    end
-
-    # Handle loss of serial connection
-    def disconnect
-      log "Connection to device lost"
-      @onclose.call if @onclose
     end
 
     def start_event_listeners
