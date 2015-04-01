@@ -70,8 +70,6 @@ module FB
           execute_command_next_tick
         end
       end
-    rescue
-      binding.pry
     end
 
     # Handle loss of serial connection

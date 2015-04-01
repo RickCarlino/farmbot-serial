@@ -12,7 +12,8 @@ module FB
     end
 
     def initialize
-      @q, @buffer = self.class.arduino.queue, ''
+      @bot = self.class.arduino
+      @q, @buffer = @bot.queue, ''
     end
 
     # Gets called when data arrives.
