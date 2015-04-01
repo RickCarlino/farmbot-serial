@@ -22,7 +22,7 @@ module FB
       @commands    = FB::OutgoingHandler.new(self)
       @inputs      = FB::IncomingHandler.new(self)
       @status      = FB::Status.new(self)
-      status.onchange { |diff| nil }
+      status.onchange { |diff| log diff }
     end
 
     # Log to screen/file/IO stream
@@ -61,12 +61,12 @@ module FB
       EM.next_tick do
         if status.ready?
           diff = (Time.now - (@time || Time.now)).to_i
-          puts "Executing #{@outgoing.count} jobs after #{diff} sconds."
+          log "Sending queue after #{diff}s delay" if diff > 0
           serial_port.puts @outgoing.pop
           @time = nil
         else
           @time ||= Time.now
-          serial_port.puts "F31 P8"
+          serial_port.puts "F83"
           execute_command_next_tick
         end
       end

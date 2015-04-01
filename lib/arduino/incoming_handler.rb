@@ -15,6 +15,8 @@ module FB
 
     def unknown(gcode)
       raise UnhandledGcode, "Dont know how to parse '#{gcode.to_s}'"
+    rescue => e
+      bot.log "Don't know how to parse incoming GCode: #{gcode}"
     end
 
     def received(gcode)
