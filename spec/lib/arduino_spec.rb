@@ -3,7 +3,8 @@ require 'spec_helper'
 describe FB::Arduino do
   let(:logger) { StringIO.new("") }
   let(:bot) do
-    FB::Arduino.new(StubSerialPort.new(0, 0), logger)
+    FB::Arduino.new(serial_port: StubSerialPort.new(0, 0),
+                    logger: logger)
   end
 
   it "initializes" do
@@ -11,7 +12,7 @@ describe FB::Arduino do
     expect(bot.serial_port).to be_kind_of(StubSerialPort)
     expect(bot.logger).to be_kind_of(StringIO)
     expect(bot.commands).to be_kind_of(FB::OutgoingHandler)
-    expect(bot.queue).to be_kind_of(EM::Channel)
+    expect(bot.inbound_queue).to be_kind_of(EM::Channel)
     expect(bot.status).to be_kind_of(FB::Status)
     expect(bot.inputs).to be_kind_of(FB::IncomingHandler)
   end

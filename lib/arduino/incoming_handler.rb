@@ -23,6 +23,10 @@ module FB
       bot.status[:busy] = 1
     end
 
+    def idle(gcode)
+      bot.status[:busy] = 0
+    end
+
     def reporting_end_stops(gcode)
       bot.status.gcode_update(gcode)
     end

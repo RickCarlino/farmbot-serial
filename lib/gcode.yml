@@ -26,6 +26,7 @@
 :F82: :report_current_position
 :F83: :report_software_version
 :E:   :emergency_stop
+:R0: :idle
 :R1: :received
 :R2: :done
 :R3: :error
