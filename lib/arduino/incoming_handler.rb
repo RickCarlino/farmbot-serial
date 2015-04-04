@@ -19,12 +19,9 @@ module FB
       bot.log "Don't know how to parse incoming GCode: #{gcode}"
     end
 
-    def received(gcode)
-      bot.status[:busy] = 1
-    end
-
-    def idle(gcode)
-      bot.status[:busy] = 0
+    def report_parameter_value(gcode)
+      # This is not correct. We need to store pin values in an array somewhere.
+      bot.status.gcode_update(gcode)
     end
 
     def reporting_end_stops(gcode)
@@ -35,16 +32,24 @@ module FB
       bot.status.gcode_update(gcode)
     end
 
+    def report_status_value(gcode)
+      bot.status.gcode_update(gcode)
+    end
+
+    def received(gcode)
+      bot.status[:busy] = 1
+    end
+
+    def idle(gcode)
+      bot.status[:busy] = 0
+    end
+
     def done(gcode)
       bot.status[:busy] = 0
     end
 
     def busy(gcode)
       bot.status[:busy] = 1
-    end
-
-    def report_status_value(gcode)
-      bot.status.gcode_update(gcode)
     end
 
     def report_software_version(gcode)

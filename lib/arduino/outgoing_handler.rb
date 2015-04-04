@@ -19,6 +19,10 @@ module FB
       write "G00 X#{x} Y#{y} Z#{z}"
     end
 
+    def move_absolute(x: 0, y: 0, z: 0, s: 100)
+      write "G00 X#{x} Y#{y} Z#{z}"
+    end
+
     def home_x
       write "F11"
     end
@@ -45,6 +49,10 @@ module FB
 
     def read_status(pin)
       write "F31 P#{pin}"
+    end
+
+    def pin_write(pin:, value:, mode:)
+      write "F41 P#{pin} V#{value} M#{mode}"
     end
 
   private

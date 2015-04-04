@@ -15,7 +15,8 @@ $commands = {
   "t" => "bot.commands.home_z",
   "y" => "bot.commands.home_all",
   "u" => "bot.commands.read_parameter(8)",
-  "i" => "bot.commands.write_parameter",
+  "i" => "bot.commands.write_parameter('x', 0)",
+  "o" => "bot.commands.write_pin(pin: 8, value: 1, mode: 1)",
   "p" => "bot.commands.read_status(8)",
 }
 

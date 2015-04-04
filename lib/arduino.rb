@@ -9,7 +9,7 @@ module FB
   class Arduino
     class EmergencyStop < StandardError; end # Not yet used.
 
-    attr_reader :serial_port, :logger, :commands, :inbound_queue, :status,
+    attr_accessor :serial_port, :logger, :commands, :inbound_queue, :status,
       :inputs, :outbound_queue
 
     # Initialize and provide a serial object, as well as an IO object to send
