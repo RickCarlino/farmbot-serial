@@ -6,7 +6,9 @@ bot = FB::Arduino.new # Defaults to '/dev/ttyACM0', can be configured.
 puts """
 FARMBOT SERIAL SANDBOX. WELCOME!
 ================================
+
 Example commands:
+
 emergency_stop
 move_relative x: 600, y: 100, z: 4
 move_relative y: -600
@@ -31,7 +33,7 @@ class KeyboardHandler < EM::Connection
   end
 
   def receive_line(data)
-    puts "=>", bot.commands.instance_eval(data)
+    puts (bot.commands.instance_eval(data) || "OK")
     print "> "
   rescue Exception => exc
     exit(0) if data.start_with?('q')
@@ -42,8 +44,8 @@ end
 
 EM.run do
   FB::ArduinoEventMachine.connect(bot)
-  bot.onmessage { |gcode| puts "INCOMING GCODE: #{gcode.name}; " }
-  bot.onchange { |diff| puts " STATUS CHANGE: #{diff}; " }
+  bot.onmessage { |gcode| puts "\nINCOMING GCODE: #{gcode.name}; " }
+  bot.onchange { |diff| puts "\nSTATUS CHANGE : #{diff}; " }
   bot.onclose { puts "bye!"; EM.stop } # Unplug the bot and see
   # EventMachine::PeriodicTimer.new(2) { bot.serial_port.puts "G82" }
   EM.open_keyboard(KeyboardHandler, bot)
