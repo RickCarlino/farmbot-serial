@@ -29,6 +29,7 @@ gem install farmbot-serial, '0.0.5'
 ```
 
 ```ruby
+require 'eventmachine'
 require 'farmbot-serial'
 
 bot = FB::Arduino.new # Defaults to '/dev/ttyACM0', can be configured.
