@@ -2,10 +2,30 @@
 
 A ruby gem for controlling Farmbot via serial line with EventMachine.
 
-## Usage
+# Usage
+
+## As an Interactive Console or Debugger
+
+```
+  git clone https://github.com/FarmBot/farmbot-serial.git
+  cd farmbot-serial
+  ruby console.rb
+
+```
+
+From there, you can type commands, such as:
+
+```
+move_relative x: 100
+```
+
+All REPL commands will be executed within the context of `bot.commands`.
+
+## As an Application
 
 ```
 gem install farmbot-serial, '0.0.5'
+
 ```
 
 ```ruby
