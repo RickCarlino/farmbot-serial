@@ -6,9 +6,9 @@ module FB
     attr_accessor :cmd, :params, :str
 
     def initialize(str)
-      @str = str
-      @params = str.split(' ').map{|line| GcodeToken.new(line)}
-      @cmd = @params.shift || 'NULL'
+      @str    = str
+      @params = str.split(' ').map { |line| GcodeToken.new(line) }
+      @cmd    = @params.shift || 'NULL'
     end
 
     # Turns a string of many gcodes into an array of many gcodes. Used to parse
@@ -23,6 +23,7 @@ module FB
     end
 
     def to_s
+      # self.to_s # => "A12 B23 C45"
       [@cmd, *@params].map(&:to_s).join(" ")
     end
 
