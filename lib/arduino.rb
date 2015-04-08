@@ -23,7 +23,7 @@ module FB
       @logger      = logger
       @commands    = FB::OutgoingHandler.new(self)
       @inputs      = FB::IncomingHandler.new(self)
-      @status      = FB::Status.new(self)
+      @status      = FB::Status.new
 
       start_event_listeners
     end
@@ -69,13 +69,11 @@ module FB
     def execute_command_next_tick
       EM.next_tick do
         if status.ready?
-          diff = (Time.now - (@time || Time.now)).to_i
-          log "Sending queue after #{diff}s delay" if diff > 0
+          log "Exec after #{(Time.now - (@time || Time.now)).to_i}s wait"
           serial_port.puts @outbound_queue.pop
           @time = nil
         else
           @time ||= Time.now
-          serial_port.puts "F31 P8"
           execute_command_next_tick
         end
       end

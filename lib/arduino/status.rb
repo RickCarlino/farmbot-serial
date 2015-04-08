@@ -3,20 +3,20 @@ module FB
     # Map of informational status and default values for status within Arduino.
     DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, Q: 0,  T: 0,  C: '', P: 0,  V: 0,
                     W: 0, L: 0, E: 0, M: 0, XA: 0, XB: 0, YA: 0, YB: 0, ZA: 0,
-                   ZB: 0,YR: 0, R: 0, BUSY: 0}
+                   ZB: 0,YR: 0, R: 0, BUSY: 1}
     Info = Struct.new(*DEFAULT_INFO.keys)
 
-    attr_reader :bot
-
-    def initialize(bot)
+    def initialize
       @changes = EM::Channel.new
-      @bot, @info = bot, Info.new(*DEFAULT_INFO.values)
+      @info    = Info.new(*DEFAULT_INFO.values)
     end
 
     def transaction(&blk)
       old = @info.to_h
       yield
-      emit_updates(old)
+      # Broadcast a diff between the old status and new status
+      diff = (@info.to_h.to_a - old.to_a).to_h
+      @changes << diff unless diff.empty?
     end
 
     def []=(register, value)
@@ -39,12 +39,6 @@ module FB
 
     def ready?
       self[:BUSY] == 0
-    end
-
-    def emit_updates(old)
-      # calculate a diff between the old status and new status
-      diff = (@info.to_h.to_a - old.to_a).to_h
-      @changes << diff unless diff.empty?
     end
   end
 end
