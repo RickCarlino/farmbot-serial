@@ -15,7 +15,7 @@ module FB
     # Gets called when data arrives.
     def receive_data(data)
       split_into_chunks(data).each do |chunk|
-        if chunk.end_with?("\r\n")
+        if chunk.end_with?("\r\n") || chunk.end_with?("R00\n")
           add_to_buffer(chunk)
           send_buffer
           clear_buffer

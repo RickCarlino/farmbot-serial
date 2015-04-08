@@ -37,5 +37,10 @@ describe FB::Gcode do
     expect(codes.last.cmd.head).to eq(:C)
     expect(codes.first.params.first.tail).to eq(34)
   end
+
+  it 'handles parameterless Gcode' do
+    expect(FB::Gcode.new("  ").name).to be(:unknown)
+    expect(FB::Gcode.new("  ").cmd).to  eq("NULL")
+  end
 end
 

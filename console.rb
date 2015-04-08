@@ -44,10 +44,10 @@ end
 
 EM.run do
   FB::ArduinoEventMachine.connect(bot)
-  bot.onmessage { |gcode| puts "\nINCOMING GCODE: #{gcode.name}; " }
-  bot.onchange { |diff| puts "\nSTATUS CHANGE : #{diff}; " }
+  bot.onmessage { |gcode| puts "NEW MESSAGE  : #{gcode};" }
+  bot.onchange  { |diff|  puts "STATUS CHANGE: #{diff};" }
   bot.onclose { puts "bye!"; EM.stop } # Unplug the bot and see
-  # EventMachine::PeriodicTimer.new(2) { bot.serial_port.puts "G82" }
+  # EventMachine::PeriodicTimer.new(7) { print '.'; bot.serial_port.puts "F31 P8" }
   EM.open_keyboard(KeyboardHandler, bot)
 end
 
