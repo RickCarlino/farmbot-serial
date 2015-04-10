@@ -13,7 +13,7 @@ module FB
 
     def transaction(&blk)
       old = @info.to_h
-      yield
+      yield(@info)
       # Broadcast a diff between the old status and new status
       diff = (@info.to_h.to_a - old.to_a).to_h
       @changes << diff unless diff.empty?

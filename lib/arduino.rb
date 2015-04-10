@@ -8,6 +8,7 @@ require_relative 'arduino/status'
 module FB
   class Arduino
     class EmergencyStop < StandardError; end # Not yet used.
+    Position = Struct.new(:x, :y, :z)
 
     attr_accessor :serial_port, :logger, :commands, :inbound_queue, :status,
       :inputs, :outbound_queue
@@ -56,6 +57,10 @@ module FB
     def disconnect
       log "Connection to device lost"
       @onclose.call if @onclose
+    end
+
+    def current_position
+      Position.new(status[:X], status[:Y], status[:Z])
     end
 
     private
