@@ -44,7 +44,9 @@ end
 
 EM.run do
   FB::ArduinoEventMachine.connect(bot)
-  bot.onmessage { |gcode| puts "NEW MESSAGE  : #{gcode};" }
+  bot.onmessage do |gcode|
+    bot.log "NEW MESSAGE  : #{gcode};" unless gcode.cmd.head == :R
+  end
   bot.onchange  { |diff|  puts "STATUS CHANGE: #{diff};" }
   bot.onclose { puts "bye!"; EM.stop } # Unplug the bot and see
   # EventMachine::PeriodicTimer.new(7) { print '.'; bot.serial_port.puts "F31 P8" }
