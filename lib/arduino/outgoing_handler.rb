@@ -16,6 +16,10 @@ module FB
     end
 
     def move_relative(x: 0, y: 0, z: 0, s: 100)
+      x += (bot.current_position.x || 0)
+      y += (bot.current_position.y || 0)
+      z += (bot.current_position.z || 0)
+
       write "G00 X#{x} Y#{y} Z#{z}"
     end
 
