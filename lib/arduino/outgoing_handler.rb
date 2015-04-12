@@ -16,11 +16,11 @@ module FB
     end
 
     def move_relative(x: 0, y: 0, z: 0, s: 100)
-        x += (bot.current_position.x || 0)
-        y += (bot.current_position.y || 0)
-        z += (bot.current_position.z || 0)
+      x += (bot.current_position.x || 0)
+      y += (bot.current_position.y || 0)
+      z += (bot.current_position.z || 0)
 
-        write { FB::Gcode.new { "G00 X#{x} Y#{y} Z#{z}" } }
+      write { FB::Gcode.new { "G00 X#{x} Y#{y} Z#{z}" } }
     end
 
     def move_absolute(x: 0, y: 0, z: 0, s: 100)
@@ -61,7 +61,7 @@ module FB
 
   private
 
-    def write(str = nil)
+    def write(str = "\n")
       bot.write( block_given? ? obj.call : FB::Gcode.new{ str } )
     end
   end
