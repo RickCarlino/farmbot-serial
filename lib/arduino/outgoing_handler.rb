@@ -62,7 +62,7 @@ module FB
   private
 
     def write(str)
-      bot.write(FB::Gcode.new(str))
+      bot.write(FB::Gcode.new{ str })
     end
   end
 end
