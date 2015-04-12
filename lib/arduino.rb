@@ -35,8 +35,8 @@ module FB
     end
 
     # Send outgoing test to arduino from pi
-    def write(string)
-      @outbound_queue.unshift string
+    def write(gcode)
+      @outbound_queue.unshift gcode
       execute_command_next_tick
     end
 
