@@ -62,7 +62,7 @@ module FB
   private
 
     def write(str = "\n")
-      bot.write( block_given? ? obj.call : FB::Gcode.new{ str } )
+      bot.write( block_given? ? yield : FB::Gcode.new{ str } )
     end
   end
 end
