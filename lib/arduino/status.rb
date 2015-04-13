@@ -3,7 +3,7 @@ module FB
     # Map of informational status and default values for status within Arduino.
     DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, Q: 0,  T: 0,  C: '', P: 0,  V: 0,
                     W: 0, L: 0, E: 0, M: 0, XA: 0, XB: 0, YA: 0, YB: 0, ZA: 0,
-                   ZB: 0,YR: 0, R: 0, BUSY: 1}
+                   ZB: 0,YR: 0, R: 0, BUSY: 1, LAST: 'none'}
     Info = Struct.new(*DEFAULT_INFO.keys)
 
     def initialize
@@ -20,7 +20,14 @@ module FB
     end
 
     def []=(register, value)
-      transaction { @info[register.upcase.to_sym] = value }
+      transaction do
+        register = register.upcase.to_sym
+        if @info.members.include?(register)
+          @info[register] = value
+        else
+          bot.log "Ignoring attempt to set unknown status value: #{register}"
+        end
+      end
     end
 
     def [](value)

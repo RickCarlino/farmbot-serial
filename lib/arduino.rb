@@ -73,15 +73,14 @@ module FB
 
     def execute_command_next_tick
       EM.next_tick do
-        if status.ready?
-          log "Exec after #{(Time.now - (@time || Time.now)).to_i}s wait"
-          serial_port.puts @outbound_queue.pop
-          @time = nil
-        else
-          @time ||= Time.now
-          execute_command_next_tick
-        end
+        status.ready? ? pop_gcode_off_queue : execute_command_next_tick
       end
+    end
+
+    def pop_gcode_off_queue
+      gcode = @outbound_queue.pop
+      status[:last] = gcode.name if gcode.respond_to?(:name)
+      serial_port.puts gcode
     end
 
     def start_event_listeners

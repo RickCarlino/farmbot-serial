@@ -13,6 +13,7 @@ module FB
     def emergency_stop(*)
       bot.outbound_queue = []  # Dump pending commands.
       bot.serial_port.puts "E" # Don't queue this one- write to serial line.
+      bot.status[:last] = :emergency_stop
     end
 
     def move_relative(x: 0, y: 0, z: 0, s: 100)
