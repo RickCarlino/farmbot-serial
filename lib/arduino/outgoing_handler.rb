@@ -11,6 +11,7 @@ module FB
     end
 
     def emergency_stop(*)
+      # This message is special- it is the only method that bypasses the queue.
       bot.outbound_queue = []  # Dump pending commands.
       bot.serial_port.puts "E" # Don't queue this one- write to serial line.
       bot.status[:last] = :emergency_stop

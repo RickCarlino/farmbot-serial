@@ -38,6 +38,10 @@ module FB
       GcodeToken.new(cmd.any? ? cmd.first : "NULL0")
     end
 
+    def value_of(param)
+      params.find{ |p| p.head == param.to_sym.upcase }.tail
+    end
+
     # A head/tail pair of a single node of GCode. Ex: R01 = [:R, '01']
     class GcodeToken
       attr_reader :head, :tail
