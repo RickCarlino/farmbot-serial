@@ -1,9 +1,7 @@
 module FB
   class Status
     # Map of informational status and default values for status within Arduino.
-    DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, Q: 0,  T: 0,  C: '', P: 0,  V: 0,
-                    W: 0, L: 0, E: 0, M: 0, XA: 0, XB: 0, YA: 0, YB: 0, ZA: 0,
-                   ZB: 0,YR: 0, R: 0, BUSY: 1, LAST: 'none'}
+    DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, BUSY: 1, LAST: 'none', PINS: {}}
     Info = Struct.new(*DEFAULT_INFO.keys)
 
     def initialize
@@ -36,7 +34,10 @@ module FB
 
     def gcode_update(gcode)
       transaction do
-        gcode.params.each { |p| @info.send("#{p.head}=", p.tail) }
+        gcode.params.each do |p|
+          setter = "#{p.head}="
+          @info.send(setter, p.tail) if @info.respond_to?(setter)
+        end
       end
     end
 
@@ -46,6 +47,15 @@ module FB
 
     def ready?
       self[:BUSY] == 0
+    end
+
+    def pin(num)
+      @info[:PINS][num] || :unknown
+    end
+
+    def set_pin(num, val)
+      val = [true, 1, '1'].include?(val) ? :on : :off
+      transaction { |info| info.PINS[num] = val }
     end
   end
 end

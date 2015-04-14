@@ -20,8 +20,7 @@ module FB
     end
 
     def report_parameter_value(gcode)
-      # This is not correct. We need to store pin values in an array somewhere.
-      bot.status.gcode_update(gcode)
+      bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
     end
 
     def reporting_end_stops(gcode)
@@ -33,7 +32,8 @@ module FB
     end
 
     def report_status_value(gcode)
-      bot.status.gcode_update(gcode)
+      # TODO: Verfiy the accuracy of this code. CC: @timevww
+      bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
     end
 
     def received(gcode)
