@@ -79,8 +79,9 @@ module FB
 
     def pop_gcode_off_queue
       gcode = @outbound_queue.pop
-      status[:last] = gcode.name if gcode.respond_to?(:name)
       serial_port.puts gcode
+      status[:last] = gcode.name if gcode.respond_to?(:name)
+      status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
     end
 
     def start_event_listeners

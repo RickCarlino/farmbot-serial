@@ -21,8 +21,9 @@ module FB
       x += (bot.current_position.x || 0)
       y += (bot.current_position.y || 0)
       z += (bot.current_position.z || 0)
-
-      write { FB::Gcode.new { "G00 X#{x} Y#{y} Z#{z}" } }
+      write do
+        FB::Gcode.new { "G00 X#{[x, 0].max} Y#{[y, 0].max} Z#{[z, 0].max}" }
+      end
     end
 
     def move_absolute(x: 0, y: 0, z: 0, s: 100)
