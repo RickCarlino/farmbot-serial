@@ -79,16 +79,16 @@ module FB
 
     def pop_gcode_off_queue
       # move_relative x: 600; move_relative x: 600; move_relative x: 600;
-      self[:BUSY] == 1
       gcode = @outbound_queue.pop
 
       unless gcode.name == :read_parameter
-        puts "Sending #{gcode.name} after #{seconds.to_f}"
         seconds = (DateTime.now - (@last || DateTime.now)) * 86400
         @last = DateTime.now
+        puts "Sending #{gcode.name} after #{seconds.to_f}"
       end
-      status[:last] = gcode.name if gcode.respond_to?(:name)
       serial_port.puts gcode
+      status[:last] = gcode.name if gcode.respond_to?(:name)
+      status[:BUSY] = 1
     end
 
     def start_event_listeners
