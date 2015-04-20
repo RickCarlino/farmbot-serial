@@ -78,8 +78,11 @@ module FB
     end
 
     def pop_gcode_off_queue
-      binding.pry
       gcode = @outbound_queue.pop
+      seconds = (DateTime.now - (@last || DateTime.now)) * 86400
+      @last = DateTime.now
+      puts "Sending #{gcode.name} after #{seconds.to_f}" unless gcode.name == :read_parameter
+      # move_relative x: 600; move_relative x: 600; move_relative x: 600;
       status[:last] = gcode.name if gcode.respond_to?(:name)
       serial_port.puts gcode
     end
