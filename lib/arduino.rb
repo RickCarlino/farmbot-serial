@@ -78,6 +78,7 @@ module FB
     end
 
     def pop_gcode_off_queue
+      binding.pry
       gcode = @outbound_queue.pop
       status[:last] = gcode.name if gcode.respond_to?(:name)
       serial_port.puts gcode
