@@ -78,16 +78,10 @@ module FB
     end
 
     def pop_gcode_off_queue
-      # move_relative x: 600; move_relative x: 600; move_relative x: 600;
       gcode = @outbound_queue.pop
-      unless gcode.name == :read_parameter
-        seconds = (DateTime.now - (@last || DateTime.now)) * 86400
-        @last = DateTime.now
-        puts "Sending #{gcode.name} after #{seconds.to_f}"
-      end
       serial_port.puts gcode
       status[:last] = gcode.name if gcode.respond_to?(:name)
-      status[:BUSY] = 1
+      status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
     end
 
     def start_event_listeners
