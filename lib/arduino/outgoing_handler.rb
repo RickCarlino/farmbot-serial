@@ -21,6 +21,7 @@ module FB
       x += (bot.current_position.x || 0)
       y += (bot.current_position.y || 0)
       z += (bot.current_position.z || 0)
+      binding.pry
       write do
         FB::Gcode.new { "G00 X#{[x, 0].max} Y#{[y, 0].max} Z#{[z, 0].max}" }
       end
