@@ -21,7 +21,7 @@ module FB
       x = [(bot.current_position.x +  (x || 0)), 0].max
       y = [(bot.current_position.y +  (y || 0)), 0].max
       z = [(bot.current_position.z +  (z || 0)), 0].max
-      print '%'
+
       write { FB::Gcode.new { "G00 X#{x} Y#{y} Z#{z}" } }
     end
 
