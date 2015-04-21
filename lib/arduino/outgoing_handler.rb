@@ -18,12 +18,11 @@ module FB
     end
 
     def move_relative(x: 0, y: 0, z: 0, s: 100)
-      x += (bot.current_position.x || 0)
-      y += (bot.current_position.y || 0)
-      z += (bot.current_position.z || 0)
-      write do
-        FB::Gcode.new { "G00 X#{[x, 0].max} Y#{[y, 0].max} Z#{[z, 0].max}" }
-      end
+      x = [(bot.current_position.x +  (x || 0)), 0].max
+      y = [(bot.current_position.y +  (y || 0)), 0].max
+      z = [(bot.current_position.z +  (z || 0)), 0].max
+
+      write { FB::Gcode.new { "G00 X#{x} Y#{y} Z#{z}" } }
     end
 
     def move_absolute(x: 0, y: 0, z: 0, s: 100)
