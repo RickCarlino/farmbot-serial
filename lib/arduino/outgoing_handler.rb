@@ -18,11 +18,14 @@ module FB
     end
 
     def move_relative(x: 0, y: 0, z: 0, s: 100)
-      x = [(bot.current_position.x +  (x || 0)), 0].max
-      y = [(bot.current_position.y +  (y || 0)), 0].max
-      z = [(bot.current_position.z +  (z || 0)), 0].max
-
-      write { FB::Gcode.new { "G00 X#{x} Y#{y} Z#{z}" } }
+      write FB::Gcode.new do
+          # TODO: At some point, I will need to figure out why this is double
+          # firing. In the meantime, the fix is to use `||=` instead of `=`
+          x1 ||= [(bot.current_position.x + (x || 0)), 0].max
+          y1 ||= [(bot.current_position.y + (y || 0)), 0].max
+          z1 ||= [(bot.current_position.z + (z || 0)), 0].max
+          "G00 X#{x1} Y#{y1} Z#{z1}"
+        end
     end
 
     def move_absolute(x: 0, y: 0, z: 0, s: 100)
@@ -65,8 +68,7 @@ module FB
   private
 
     def write(str = "\n")
-      bot.write( block_given? ? yield : FB::Gcode.new{ str } )
+      bot.write( block_given? ? yield : str )
     end
   end
 end
-
