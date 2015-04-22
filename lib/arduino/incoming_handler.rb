@@ -3,8 +3,6 @@ module FB
   class IncomingHandler
     attr_reader :bot
 
-    class UnhandledGcode < StandardError; end
-
     def initialize(bot)
       @bot = bot
     end
