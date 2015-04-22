@@ -7,6 +7,13 @@ describe FB::Arduino do
     FB::Arduino.new(serial_port: serial_port, logger: logger)
   end
 
+
+  it "logs" do
+    bot.log 'Hello, world!'
+    expect(logger.message).to eq('Hello, world!')
+  end
+
+
   it "initializes" do
     expect(bot).to be_kind_of(FB::Arduino)
     expect(bot.serial_port).to be_kind_of(FakeSerialPort)
