@@ -70,9 +70,14 @@ module FB
 
     def pop_gcode_off_queue
       gcode = @outbound_queue.pop
-      serial_port.puts gcode
-      status[:last] = gcode.name if gcode.respond_to?(:name)
-      status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
+      if gcode.is_a?(FB::Gcode)
+        serial_port.puts gcode
+        status[:last] = gcode.name
+        status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
+      else
+        raise TypeError, "Outbound messages must be GCode objects. "\
+                         "Use of #{gcode.class} is not permitted."
+      end
     end
 
     def start_event_listeners
