@@ -68,6 +68,10 @@ module FB
       end
     end
 
+    def next_cmd
+      outbound_queue.first
+    end
+
     def pop_gcode_off_queue
       gcode = @outbound_queue.pop
       if gcode.is_a?(FB::Gcode)
