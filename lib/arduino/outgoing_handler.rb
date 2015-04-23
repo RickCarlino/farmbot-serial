@@ -4,8 +4,6 @@ module FB
   class OutgoingHandler
     attr_reader :bot
 
-    class UnhandledGcode < StandardError; end
-
     def initialize(bot)
       @bot = bot
     end
@@ -18,55 +16,58 @@ module FB
     end
 
     def move_relative(x: 0, y: 0, z: 0, s: 100)
-      x = [(bot.current_position.x +  (x || 0)), 0].max
-      y = [(bot.current_position.y +  (y || 0)), 0].max
-      z = [(bot.current_position.z +  (z || 0)), 0].max
+      write do
+        # TODO: At some point, I will need to figure out why this is double
+        # firing. In the meantime, the fix is to use `||=` instead of `=`
+        x1 ||= [(bot.current_position.x + (x || 0)), 0].max
+        y1 ||= [(bot.current_position.y + (y || 0)), 0].max
+        z1 ||= [(bot.current_position.z + (z || 0)), 0].max
 
-      write { FB::Gcode.new { "G00 X#{x} Y#{y} Z#{z}" } }
+        "G00 X#{x1} Y#{y1} Z#{z1}"
+      end
     end
 
     def move_absolute(x: 0, y: 0, z: 0, s: 100)
-      write "G00 X#{x} Y#{y} Z#{z}"
+      write { "G00 X#{x} Y#{y} Z#{z}" }
     end
 
     def home_x
-      write "F11"
+      write { "F11" }
     end
 
     def home_y
-      write "F12"
+      write { "F12" }
     end
 
     def home_z
-      write "F13"
+      write { "F13" }
     end
 
     def home_all
-      write "G28"
+      write { "G28" }
     end
 
     def read_parameter(num)
-      write "F21 P#{num}"
+      write { "F21 P#{num}" }
     end
 
     def write_parameter(num, val)
-      write "F22 P#{num} V#{val}"
+      write { "F22 P#{num} V#{val}" }
     end
 
     def read_status(pin)
-      write "F31 P#{pin}"
+      write { "F31 P#{pin}" }
     end
 
     def pin_write(pin:, value:, mode:)
-      write "F41 P#{pin} V#{value} M#{mode}"
+      write { "F41 P#{pin} V#{value} M#{mode}" }
       bot.status.set_pin(pin, value)
     end
 
   private
 
-    def write(str = "\n")
-      bot.write( block_given? ? yield : FB::Gcode.new{ str } )
+    def write(&blk)
+      bot.write(FB::Gcode.new(&blk))
     end
   end
 end
-

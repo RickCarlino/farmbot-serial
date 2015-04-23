@@ -7,7 +7,6 @@ require_relative 'arduino/status'
 # Communicate with the arduino using a serial interface
 module FB
   class Arduino
-    class EmergencyStop < StandardError; end # Not yet used.
     Position = Struct.new(:x, :y, :z)
 
     attr_accessor :serial_port, :logger, :commands, :inbound_queue, :status,
@@ -63,14 +62,6 @@ module FB
       Position.new(status[:X], status[:Y], status[:Z])
     end
 
-    private
-
-    # Highest priority message when processing incoming Gcode. Use for system
-    # level status changes.
-    def parse_incoming(gcode)
-      inputs.execute(gcode)
-    end
-
     def execute_command_next_tick
       EM.next_tick do
         status.ready? ? pop_gcode_off_queue : execute_command_next_tick
@@ -79,9 +70,14 @@ module FB
 
     def pop_gcode_off_queue
       gcode = @outbound_queue.pop
-      serial_port.puts gcode
-      status[:last] = gcode.name if gcode.respond_to?(:name)
-      status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
+      if gcode.is_a?(FB::Gcode)
+        serial_port.puts gcode
+        status[:last] = gcode.name
+        status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
+      else
+        raise TypeError, "Outbound messages must be GCode objects. "\
+                         "Use of #{gcode.class} is not permitted."
+      end
     end
 
     def start_event_listeners
@@ -92,6 +88,14 @@ module FB
           @onmessage.call(gcode) if @onmessage
         end
       end
+    end
+
+  private
+
+    # Highest priority method for processing incoming Gcode. Use for system
+    # level status changes.
+    def parse_incoming(gcode)
+      inputs.execute(gcode)
     end
   end
 end

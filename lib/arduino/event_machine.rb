@@ -7,6 +7,8 @@ module FB
       attr_accessor :arduino
     end
 
+    attr_reader :q, :buffer, :bot
+
     def initialize
       @bot = self.class.arduino
       @q, @buffer = @bot.inbound_queue, ''
