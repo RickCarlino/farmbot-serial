@@ -20,11 +20,7 @@ module FB
     def []=(register, value)
       transaction do
         register = register.upcase.to_sym
-        if @info.members.include?(register)
-          @info[register] = value
-        else
-          bot.log "Ignoring attempt to set unknown status value: #{register}"
-        end
+        @info[register] = value if @info.members.include?(register)
       end
     end
 

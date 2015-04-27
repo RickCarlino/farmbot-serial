@@ -14,6 +14,7 @@ module FB
 
     # Why `def self::new()`? it was defined that way in the parent class,
     # therefore, I can't call super in #initialize().
+    #:nocov:
     def self::new(com = COM_PORT, conf = OPTIONS)
       super
     end

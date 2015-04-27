@@ -68,6 +68,10 @@ module FB
       end
     end
 
+    def next_cmd
+      outbound_queue.first
+    end
+
     def pop_gcode_off_queue
       gcode = @outbound_queue.pop
       if gcode.is_a?(FB::Gcode)
@@ -83,7 +87,7 @@ module FB
     def start_event_listeners
       status.onchange { |diff| @onchange.call(diff) if @onchange }
       inbound_queue.subscribe do |gcodes|
-        gcodes.each do |gcode|
+        Array(gcodes).each do |gcode|
           parse_incoming(gcode)
           @onmessage.call(gcode) if @onmessage
         end

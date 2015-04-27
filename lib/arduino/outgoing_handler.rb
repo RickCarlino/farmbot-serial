@@ -17,8 +17,9 @@ module FB
 
     def move_relative(x: 0, y: 0, z: 0, s: 100)
       write do
-        # TODO: At some point, I will need to figure out why this is double
-        # firing. In the meantime, the fix is to use `||=` instead of `=`
+        # REMEBER: YOU NEVER WANT TO MUTATE VARIABLES HERE. If you mutate vars
+        # in a block, it will result in the return value getting incremented
+        # every time the value is read. For this reason, we use ||= and not =.
         x1 ||= [(bot.current_position.x + (x || 0)), 0].max
         y1 ||= [(bot.current_position.y + (y || 0)), 0].max
         z1 ||= [(bot.current_position.z + (z || 0)), 0].max
@@ -28,6 +29,9 @@ module FB
     end
 
     def move_absolute(x: 0, y: 0, z: 0, s: 100)
+      x = [x.to_i, 0].max
+      y = [y.to_i, 0].max
+      z = [z.to_i, 0].max
       write { "G00 X#{x} Y#{y} Z#{z}" }
     end
 
