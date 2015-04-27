@@ -36,5 +36,20 @@ describe FB::IncomingHandler do
     expect(status[:busy]).to eq(1)
     expect(@diff).to eq(:BUSY => 1)
   end
+
+  it 'Updates status registers directly from GCode' do
+    command = FB::Gcode.new { "A1 X88 Y77 Z66" }
+    status.gcode_update(command)
+    expect(status[:x]).to eq(88)
+    expect(status[:y]).to eq(77)
+    expect(status[:z]).to eq(66)
+  end
+
+  it 'reads known and unknow pin values' do
+    status.set_pin(1, 1)
+    expect(status.pin(1)).to eq(:on)
+    expect(status.pin(2)).to eq(:unknown)
+  end
+
 end
 

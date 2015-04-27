@@ -87,7 +87,7 @@ module FB
     def start_event_listeners
       status.onchange { |diff| @onchange.call(diff) if @onchange }
       inbound_queue.subscribe do |gcodes|
-        gcodes.each do |gcode|
+        Array(gcodes).each do |gcode|
           parse_incoming(gcode)
           @onmessage.call(gcode) if @onmessage
         end

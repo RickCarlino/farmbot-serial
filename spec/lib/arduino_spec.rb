@@ -3,18 +3,19 @@ require 'spec_helper'
 describe FB::Arduino do
   let(:logger) { FakeLogger.new }
   let(:serial_port) { FakeSerialPort.new }
+  let(:command) { FB::Gcode.new { 'A1 B2 C3' } }
   let(:bot) do
     FB::Arduino.new(serial_port: serial_port, logger: logger)
   end
 
 
-  it "logs" do
+  it 'logs' do
     bot.log 'Hello, world!'
     expect(logger.message).to eq('Hello, world!')
   end
 
 
-  it "initializes" do
+  it 'initializes' do
     expect(bot).to be_kind_of(FB::Arduino)
     expect(bot.serial_port).to be_kind_of(FakeSerialPort)
     expect(bot.logger).to be_kind_of(StringIO)
@@ -25,17 +26,17 @@ describe FB::Arduino do
   end
 
   it 'prints to the logger object' do
-    bot.log "Hello, World!"
-    expect(logger.message).to eq("Hello, World!")
+    bot.log 'Hello, World!'
+    expect(logger.message).to eq('Hello, World!')
   end
 
   it 'writes to outbound command queue' do
-    bot.write("A1 B2 C3")
-    expect(bot.outbound_queue).to include("A1 B2 C3")
+    bot.write('A1 B2 C3')
+    expect(bot.outbound_queue).to include('A1 B2 C3')
   end
 
-  it "sets change/message/close callbacks" do
-    yowza = ->{ bot.log "QQQ" }
+  it 'sets change/message/close callbacks' do
+    yowza = ->{ bot.log 'QQQ' }
     bot.onmessage(&yowza)
     bot.onclose(&yowza)
     bot.onchange(&yowza)
@@ -44,16 +45,16 @@ describe FB::Arduino do
     expect(bot.instance_variable_get(:@onchange)).to be(yowza)
   end
 
-  it "calls onclose callback via disconnect()" do
+  it 'calls onclose callback via disconnect()' do
     calls = []
-    bot.onclose { calls << "Hey!" }
+    bot.onclose { calls << 'Hey!' }
     bot.disconnect
-    expect(logger.message).to eq("Connection to device lost")
+    expect(logger.message).to eq('Connection to device lost')
     expect(calls.length).to eq(1)
-    expect(calls).to include("Hey!")
+    expect(calls).to include('Hey!')
   end
 
-  it "reports current_position" do
+  it 'reports current_position' do
     bot.status[:x] = 1
     bot.status[:y] = 2
     bot.status[:z] = 3
@@ -62,15 +63,38 @@ describe FB::Arduino do
     expect(bot.current_position.z).to eq(3)
   end
 
-  it "pops gcode off queue" do
-    command = FB::Gcode.new { "A1 B2 C3" }
+  it 'pops gcode off queue' do
     bot.outbound_queue.push(command)
     expect(bot.outbound_queue.length).to eq(1)
     within_event_loop { bot.pop_gcode_off_queue }
     expect(bot.outbound_queue.length).to eq(0)
-    expect(serial_port.message).to eq("A1 B2 C3")
+    expect(serial_port.message).to eq('A1 B2 C3')
     expect(bot.status.ready?).to be_falsey
     expect(bot.status[:last]).to eq(:unknown)
   end
-end
 
+  it 'starts event listeners' do
+    called_onmessage = 0
+    called_onchange  = 0
+    bot.inbound_queue.push(command)
+
+    bot.onmessage do |msg|
+      called_onmessage += 1
+      bot.status[:X] = 33
+    end
+
+    bot.onchange do |diff|
+      called_onchange += 1
+    end
+
+    within_event_loop { bot }
+
+    expect(called_onmessage).to eq(1)
+    expect(called_onchange).to eq(1)
+  end
+
+  it 'Flips out if a message is not a GCode object.' do
+    bot.inbound_queue.push "I don't think so!"
+    expect { bot.pop_gcode_off_queue }.to raise_error(TypeError)
+  end
+end
