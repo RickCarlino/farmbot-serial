@@ -36,7 +36,6 @@ module FB
     # Send outgoing test to arduino from pi
     def write(gcode)
       @outbound_queue.unshift gcode
-      execute_command_next_tick
     end
 
     def onchange(&blk)
@@ -62,10 +61,8 @@ module FB
       Position.new(status[:X], status[:Y], status[:Z])
     end
 
-    def execute_command_next_tick
-      EM.next_tick do
-        status.ready? ? pop_gcode_off_queue : execute_command_next_tick
-      end
+    def maybe_execute_command
+      pop_gcode_off_queue if status.ready?
     end
 
     def next_cmd
@@ -85,6 +82,7 @@ module FB
     end
 
     def start_event_listeners
+      EM.tick_loop { maybe_execute_command } # A noble experiment.
       status.onchange { |diff| @onchange.call(diff) if @onchange }
       inbound_queue.subscribe do |gcodes|
         Array(gcodes).each do |gcode|
