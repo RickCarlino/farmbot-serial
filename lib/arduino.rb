@@ -24,8 +24,6 @@ module FB
       @commands    = FB::OutgoingHandler.new(self)
       @inputs      = FB::IncomingHandler.new(self)
       @status      = FB::Status.new
-
-      start_event_listeners
     end
 
     # Log to screen/file/IO stream
@@ -79,7 +77,6 @@ module FB
     end
 
     def start_event_listeners
-      EM.tick_loop { maybe_execute_command } # A noble experiment.
       status.onchange { |diff| @onchange.call(diff) if @onchange }
       inbound_queue.subscribe do |gcodes|
         Array(gcodes).each do |gcode|
@@ -87,6 +84,12 @@ module FB
           @onmessage.call(gcode) if @onmessage
         end
       end
+    end
+
+    def start
+      # A noble experiment.
+      EventMachine::PeriodicTimer.new(0.1) { maybe_execute_command }
+      start_event_listeners
     end
 
   private
