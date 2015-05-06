@@ -76,8 +76,8 @@ module FB
         status[:last] = gcode.name
         status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
       else
-        raise TypeError, "Outbound messages must be GCode objects. Use of "\
-                         "#{gcode.class}:#{gcode.inspect} is not permitted."
+        return log "Outbound messages must be GCode objects. Use of "\
+                   "#{gcode.class}:#{gcode.inspect} is not permitted."
       end
     end
 
