@@ -50,7 +50,6 @@ EM.run do
   end
   bot.onchange  { |diff|  puts "STATUS CHANGE: #{diff};" }
   bot.onclose { puts "bye!"; EM.stop } # Unplug the bot and see
-  # EventMachine::PeriodicTimer.new(7) { print '.'; bot.serial_port.puts "F31 P8" }
   EM.open_keyboard(KeyboardHandler, bot)
   0.upto(14) { |num| bot.commands.read_parameter(num) }
 
