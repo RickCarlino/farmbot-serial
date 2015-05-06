@@ -66,7 +66,8 @@ describe FB::Arduino do
   it 'pops gcode off queue' do
     bot.outbound_queue.push(command)
     expect(bot.outbound_queue.length).to eq(1)
-    within_event_loop { bot.pop_gcode_off_queue }
+    bot.status[:BUSY] = 0
+    within_event_loop { bot.maybe_execute_command }
     expect(bot.outbound_queue.length).to eq(0)
     expect(serial_port.message).to eq('A1 B2 C3')
     expect(bot.status.ready?).to be_falsey
@@ -95,7 +96,7 @@ describe FB::Arduino do
 
   it 'Flips out if a message is not a GCode object.' do
     bot.outbound_queue.push "I don't think so!"
-    bot.pop_gcode_off_queue
+    bot.maybe_execute_command
     expect(logger.message).to eq("Outbound messages must be GCode objects. "\
       "Use of String:\"I don't think so!\" is not permitted.")
   end

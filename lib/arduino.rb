@@ -61,17 +61,14 @@ module FB
       Position.new(status[:X], status[:Y], status[:Z])
     end
 
-    def maybe_execute_command
-      pop_gcode_off_queue if status.ready?
-    end
-
     def next_cmd
       outbound_queue.first
     end
 
-    def pop_gcode_off_queue
+    def maybe_execute_command
       gcode = @outbound_queue.pop
-      if gcode.is_a?(FB::Gcode)
+      return unless gcode
+      if status.ready? && gcode.is_a?(FB::Gcode) # Flip flop order for performance?
         serial_port.puts gcode
         status[:last] = gcode.name
         status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
