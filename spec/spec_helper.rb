@@ -32,6 +32,6 @@ end
 def within_event_loop(ticks_remaining = 1)
   EM.run do
     yield
-    EventMachine::PeriodicTimer.new(0.25) { EM.stop }
+    EventMachine::PeriodicTimer.new(0.1) { EM.stop }
   end
 end

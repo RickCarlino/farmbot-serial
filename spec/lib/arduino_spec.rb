@@ -67,9 +67,7 @@ describe FB::Arduino do
     bot.outbound_queue.push(command)
     expect(bot.outbound_queue.length).to eq(1)
     bot.status[:BUSY] = 0
-    within_event_loop {
-      bot.start
-      bot.maybe_execute_command }
+    within_event_loop { bot.maybe_execute_command }
     expect(bot.outbound_queue.length).to eq(0)
     expect(serial_port.message).to eq('A1 B2 C3')
     expect(bot.status.ready?).to be_falsey
@@ -90,7 +88,7 @@ describe FB::Arduino do
       called_onchange += 1
     end
 
-    within_event_loop { bot.start }
+    within_event_loop { nil }
 
     expect(called_onmessage).to eq(1)
     expect(called_onchange).to eq(1)
