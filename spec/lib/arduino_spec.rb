@@ -96,6 +96,7 @@ describe FB::Arduino do
 
   it 'Flips out if a message is not a GCode object.' do
     bot.outbound_queue.push "I don't think so!"
+    bot.status[:BUSY] = 0
     bot.maybe_execute_command
     expect(logger.message).to eq("Outbound messages must be GCode objects. "\
       "Use of String:\"I don't think so!\" is not permitted.")

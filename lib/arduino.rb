@@ -68,8 +68,8 @@ module FB
     def maybe_execute_command
       sleep 0.05 # Throttle CPU
       gcode = @outbound_queue.pop
-      return unless gcode
-      if status.ready? && gcode.is_a?(FB::Gcode) # Flip flop order for performance?
+      return unless gcode && status.ready?
+      if gcode.is_a?(FB::Gcode)
         serial_port.puts gcode
         status[:last] = gcode.name
         status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
