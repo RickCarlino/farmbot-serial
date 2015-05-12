@@ -66,10 +66,11 @@ module FB
     end
 
     def maybe_execute_command
-      sleep 0.05 # Throttle CPU
+      sleep 0.08 # Throttle CPU
       gcode = @outbound_queue.pop
       return unless gcode && status.ready?
       if gcode.is_a?(FB::Gcode)
+        log "RPI MSG: #{gcode}"
         serial_port.puts gcode
         status[:last] = gcode.name
         status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
