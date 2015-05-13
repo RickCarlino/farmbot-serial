@@ -65,18 +65,27 @@ module FB
       outbound_queue.first
     end
 
-    def maybe_execute_command
-      sleep 0.05 # Throttle CPU
+    def maybe_execute_command # This method smells procedural. Refactor?
+      sleep 0.08 # Throttle CPU
+      return unless can_execute?
       gcode = @outbound_queue.pop
-      return unless gcode && status.ready?
-      if gcode.is_a?(FB::Gcode)
-        serial_port.puts gcode
-        status[:last] = gcode.name
-        status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
-      else
-        return log "Outbound messages must be GCode objects. Use of "\
-                   "#{gcode.class}:#{gcode.inspect} is not permitted."
-      end
+      gcode.is_a?(FB::Gcode) ? execute_now(gcode) : reject_gcode(gcode)
+    end
+
+    def can_execute? # If the device is ready and commands are in the queue
+      @outbound_queue.any? && status.ready?
+    end
+
+    def execute_now(gcode)
+      log "RPI MSG: #{gcode}"
+      serial_port.puts gcode
+      status[:last] = gcode.name
+      status[:BUSY] = 1 # If not, pi will race arduino and "talk too fast"
+    end
+
+    def reject_gcode(gcode)
+      log "Outbound messages must be GCode objects. Use of "\
+          "#{gcode.class}:#{gcode.inspect} is not permitted."
     end
 
     def start_event_listeners
