@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FB::IncomingHandler do
+describe FB::Status do
 
   let(:status) { FB::Status.new }
 

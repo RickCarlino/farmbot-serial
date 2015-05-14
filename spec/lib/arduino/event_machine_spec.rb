@@ -41,4 +41,50 @@ describe FB::ArduinoEventMachine do
     em.clear_buffer
     expect(em.buffer).to eq('')
   end
+
+  it 'receives data (normal end of chunk)' do
+    allow(em).to receive(:add_to_buffer).ordered
+    allow(em).to receive(:send_buffer).ordered
+    allow(em).to receive(:clear_buffer).ordered
+    allow(em.q).to receive(:clear_buffer)
+    em.receive_data("\r\n")
+    expect(em).to have_received(:add_to_buffer)
+    expect(em).to have_received(:send_buffer)
+    expect(em).to have_received(:clear_buffer)
+  end
+
+  it 'receives data (incomplete end of chunk)' do
+    allow(em).to receive(:add_to_buffer).ordered
+    allow(em).to receive(:send_buffer).ordered
+    allow(em).to receive(:clear_buffer).ordered
+    msg = "R00\n"
+    em.receive_data(msg)
+    expect(em).to have_received(:add_to_buffer).with(msg)
+    expect(em).to have_received(:send_buffer)
+    expect(em).to have_received(:clear_buffer)
+  end
+
+  it 'receives data (middle of chunk)' do
+    allow(em).to receive(:add_to_buffer)
+    allow(em).to receive(:send_buffer).ordered
+    allow(em).to receive(:clear_buffer).ordered
+    msg = "R01\n"
+    em.receive_data(msg)
+    expect(em).to have_received(:add_to_buffer).with(msg)
+    expect(em).to_not have_received(:send_buffer)
+    expect(em).to_not have_received(:clear_buffer)
+  end
+
+  it 'unbinds' do
+    allow(EM).to receive(:stop)#.ordered
+    em.unbind
+    expect(EM).to have_received(:stop)
+  end
+
+  it 'connects a bot' do
+    allow(EM).to receive(:attach)
+    em.class.connect(bot)
+    expect(EM).to have_received(:attach).with(bot.serial_port, em.class)
+    expect(em.class.arduino).to be(bot)
+  end
 end
