@@ -74,4 +74,17 @@ describe FB::ArduinoEventMachine do
     expect(em).to_not have_received(:send_buffer)
     expect(em).to_not have_received(:clear_buffer)
   end
+
+  it 'unbinds' do
+    allow(EM).to receive(:stop)#.ordered
+    em.unbind
+    expect(EM).to have_received(:stop)
+  end
+
+  it 'connects a bot' do
+    allow(EM).to receive(:attach)
+    em.class.connect(bot)
+    expect(EM).to have_received(:attach).with(bot.serial_port, em.class)
+    expect(em.class.arduino).to be(bot)
+  end
 end

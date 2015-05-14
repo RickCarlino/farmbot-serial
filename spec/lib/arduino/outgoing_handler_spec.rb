@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe FB::ArduinoEventMachine do
+describe FB::OutgoingHandler do
 
   let(:handler) { FB::OutgoingHandler.new(FakeArduino.new) }
   let(:bot) { handler.bot }
