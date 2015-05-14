@@ -10,6 +10,7 @@ require 'farmbot-serial'
 require_relative 'fakes/fake_serial_port'
 require_relative 'fakes/fake_logger'
 require_relative 'fakes/fake_arduino'
+require_relative 'fakes/fake_gcode'
 
 require 'ruby-prof'
 
