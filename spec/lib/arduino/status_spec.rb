@@ -51,5 +51,11 @@ describe FB::Status do
     expect(status.pin(2)).to eq(:unknown)
   end
 
+  it 'serializes into a hash' do
+    reality = status.instance_variable_get("@info").to_h
+    perception = status.to_h
+    expect(perception).to eq(reality)
+  end
+
 end
 
