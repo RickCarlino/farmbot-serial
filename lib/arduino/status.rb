@@ -28,6 +28,10 @@ module FB
       @info[value.upcase.to_sym]
     end
 
+    def to_h
+      @info.to_h
+    end
+
     def gcode_update(gcode)
       transaction do
         gcode.params.each do |p|
