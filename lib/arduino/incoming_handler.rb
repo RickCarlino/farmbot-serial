@@ -53,5 +53,9 @@ module FB
     def report_software_version(gcode)
       nil # Don't need the info right now.
     end
+
+    def debug_message
+      nil # Squelch debug messages.
+    end
   end
 end
