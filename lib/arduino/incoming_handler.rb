@@ -54,7 +54,7 @@ module FB
       nil # Don't need the info right now.
     end
 
-    def debug_message
+    def debug_message(*)
       nil # Squelch debug messages.
     end
   end
