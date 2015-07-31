@@ -18,7 +18,7 @@ module FB
     end
 
     def report_parameter_value(gcode)
-      bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
+      bot.status.set(gcode.value_of(:P), gcode.value_of(:V))
     end
 
     def reporting_end_stops(gcode)
@@ -31,7 +31,7 @@ module FB
 
     def report_status_value(gcode)
       # TODO: Verfiy the accuracy of this code. CC: @timevww
-      bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
+      bot.status.set(gcode.value_of(:P), gcode.value_of(:V))
     end
 
     def received(gcode)
@@ -48,6 +48,10 @@ module FB
 
     def busy(gcode)
       bot.status[:busy] = 1
+    end
+
+    def write_parameter(gcode)
+      raise 'write_parameter is not yet implemented.'
     end
 
     def report_software_version(gcode)

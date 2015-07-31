@@ -65,7 +65,7 @@ module FB
 
     def pin_write(pin:, value:, mode:)
       write { "F41 P#{pin} V#{value} M#{mode}" }
-      bot.status.set_pin(pin, value)
+      bot.status.set(pin, value)
     end
 
   private

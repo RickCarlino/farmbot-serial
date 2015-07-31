@@ -46,7 +46,7 @@ describe FB::Status do
   end
 
   it 'reads known and unknow pin values' do
-    status.set_pin(1, 1)
+    status.set(1, 1)
     expect(status.pin(1)).to eq(:on)
     expect(status.pin(2)).to eq(:unknown)
   end
