@@ -1,7 +1,10 @@
 require 'yaml'
 module FB
   class Gcode
-    GCODE_DICTIONARY = YAML.load_file(File.join(File.dirname(__FILE__), 'gcode.yml'))
+    GCODE_DICTIONARY     = YAML.load_file(File.join(File.dirname(__FILE__),
+                                          'gcode.yml'))
+    PARAMETER_DICTIONARY = YAML.load_file(File.join(File.dirname(__FILE__),
+                                          'parameters.yml'))
 
     attr_accessor :cmd, :params, :block
 

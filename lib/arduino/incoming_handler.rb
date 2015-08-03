@@ -8,17 +8,21 @@ module FB
     end
 
     def execute(gcode)
-      self.send(gcode.name, gcode)
-    rescue NoMethodError
-      bot.log "#{gcode.name} is a valid GCode, but no input handler method exists"
+      name = gcode.name
+      if respond_to?(name)
+        self.send(name, gcode)
+      else
+        bot.log "#{gcode.name} is a valid GCode, but no input handler method exists"
+      end
     end
 
     def unknown(gcode)
       bot.log "Don't know how to parse incoming GCode: #{gcode}"
     end
 
+    # Called when the Ardunio is reporting the status of a parameter.
     def report_parameter_value(gcode)
-      bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
+      bot.status.set(gcode.value_of(:P), gcode.value_of(:V))
     end
 
     def reporting_end_stops(gcode)
@@ -31,7 +35,7 @@ module FB
 
     def report_status_value(gcode)
       # TODO: Verfiy the accuracy of this code. CC: @timevww
-      bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
+      bot.status.set(gcode.value_of(:P), gcode.value_of(:V))
     end
 
     def received(gcode)
@@ -50,8 +54,16 @@ module FB
       bot.status[:busy] = 1
     end
 
+    def write_parameter(gcode)
+      raise 'write_parameter is not yet implemented.'
+    end
+
     def report_software_version(gcode)
       nil # Don't need the info right now.
+    end
+
+    def debug_message(*)
+      nil # Squelch debug messages.
     end
   end
 end

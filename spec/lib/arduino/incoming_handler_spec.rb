@@ -5,15 +5,17 @@ describe FB::IncomingHandler do
   let(:bot) { FakeArduino.new }
   let(:handler) { FB::IncomingHandler.new(bot) }
 
+  it 'gets calibration data' do
+    gcode = FB::Gcode.new { "R21 P71 V7654" }
+    handler.execute(gcode)
+    expect(bot.status.to_h[:MOVEMENT_MAX_SPD_X]).to eq(7654)
+  end
+
   it 'handles unknowns' do
     handler.execute(FakeGcode.new('hello', 'abc'))
     expectation = "hello is a valid GCode, but no input handler method exists"
     expect(bot.logger.message).to eq(expectation)
   end
-
-  # def report_parameter_value(gcode)
-  #   bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
-  # end
 
   it 'reports the value of a parameter' do
     handler.report_parameter_value(FB::Gcode.new { "A1 P1 V0" })

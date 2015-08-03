@@ -1,3 +1,5 @@
+# This is a dictionary of all the GCodes. They are used by the Arduino to
+# differentiate commands.
 ---
 :G0:  :move_to_location_at_given_speed_for_axis
 :G1:  :move_to_location_on_a_straight_line

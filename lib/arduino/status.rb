@@ -1,12 +1,11 @@
 module FB
   class Status
     # Map of informational status and default values for status within Arduino.
-    DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, BUSY: 1, LAST: 'none', PINS: {}}
-    Info = Struct.new(*DEFAULT_INFO.keys)
+    DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, BUSY: 1, LAST: 'none'}
 
     def initialize
       @changes = EM::Channel.new
-      @info    = Info.new(*DEFAULT_INFO.values)
+      @info    = OpenStruct.new(DEFAULT_INFO)
     end
 
     def transaction(&blk)
@@ -18,14 +17,11 @@ module FB
     end
 
     def []=(register, value)
-      transaction do
-        register = register.upcase.to_sym
-        @info[register] = value if @info.members.include?(register)
-      end
+      transaction { @info[register.to_s.upcase] = value }
     end
 
     def [](value)
-      @info[value.upcase.to_sym]
+      @info[value.upcase.to_s]
     end
 
     def to_h
@@ -34,10 +30,7 @@ module FB
 
     def gcode_update(gcode)
       transaction do
-        gcode.params.each do |p|
-          setter = "#{p.head}="
-          @info.send(setter, p.tail) if @info.respond_to?(setter)
-        end
+        gcode.params.each { |p| @info[p.head] = p.tail }
       end
     end
 
@@ -49,13 +42,22 @@ module FB
       self[:BUSY] == 0
     end
 
-    def pin(num)
-      @info[:PINS][num] || :unknown
+    def get(val)
+      @info[val.to_s.upcase] || :unknown
     end
 
-    def set_pin(num, val)
-      val = [true, 1, '1'].include?(val) ? :on : :off
-      transaction { |info| info.PINS[num] = val }
+    def set(key, val)
+      transaction do |info|
+        info[Gcode::PARAMETER_DICTIONARY.fetch(key, key.to_s)] = val
+      end
+    end
+
+    def pin(num)
+      case get(num)
+      when false, 0, :off then :off
+      when true, 1, :on then :on
+      else; :unknown
+      end
     end
   end
 end
