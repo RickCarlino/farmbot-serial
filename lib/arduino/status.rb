@@ -47,7 +47,9 @@ module FB
     end
 
     def set(key, val)
-      transaction { |info| info[key.to_s] = val }
+      transaction do |info|
+        info[Gcode::PARAMETER_DICTIONARY.fetch(key, key.to_s)] = val
+      end
     end
 
     def pin(num)

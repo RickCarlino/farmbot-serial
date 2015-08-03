@@ -6,10 +6,9 @@ describe FB::IncomingHandler do
   let(:handler) { FB::IncomingHandler.new(bot) }
 
   it 'gets calibration data' do
-    gcode = FB::Gcode.new { "R21 P71 V1000" }
+    gcode = FB::Gcode.new { "R21 P71 V7654" }
     handler.execute(gcode)
-    expect(bot.status.to_h[:MOVEMENT_MAX_SPD_X]).to eq(0)
-    pending
+    expect(bot.status.to_h[:MOVEMENT_MAX_SPD_X]).to eq(7654)
   end
 
   it 'handles unknowns' do

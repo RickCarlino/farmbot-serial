@@ -8,15 +8,19 @@ module FB
     end
 
     def execute(gcode)
-      self.send(gcode.name, gcode)
-    rescue NoMethodError
-      bot.log "#{gcode.name} is a valid GCode, but no input handler method exists"
+      name = gcode.name
+      if respond_to?(name)
+        self.send(name, gcode)
+      else
+        bot.log "#{gcode.name} is a valid GCode, but no input handler method exists"
+      end
     end
 
     def unknown(gcode)
       bot.log "Don't know how to parse incoming GCode: #{gcode}"
     end
 
+    # Called when the Ardunio is reporting the status of a parameter.
     def report_parameter_value(gcode)
       bot.status.set(gcode.value_of(:P), gcode.value_of(:V))
     end
