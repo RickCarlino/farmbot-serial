@@ -68,10 +68,62 @@ module FB
       bot.status.set(pin, value)
     end
 
+    def set_max_speed(axis, value)
+      set_paramater_value(axis, value, 71, 72, 73)
+    end
+
+    def set_acceleration(axis, value)
+      set_paramater_value(axis, value, 41, 42, 43)
+    end
+
+    def set_timeout(axis, value)
+      set_paramater_value(axis, value, 11, 12, 13)
+    end
+
+    def set_steps_per_mm(axis, value)
+      raise "The Farmbot Arduino does not currently store a value for steps "\
+            "per mm. Keep track of this information at the application level"
+    end
+
+    def set_end_inversion(axis, value)
+      set_paramater_value(axis, bool_to_int(value), 21, 22, 23)
+    end
+
+    def set_motor_inversion(axis, value)
+      set_paramater_value(axis, bool_to_int(value), 31, 32, 33)
+    end
+
+    def set_negative_coordinates(axis, value)
+      raise "Not yet implemented. TODO: This method."
+    end
+
   private
+
+    class InvalidAxisEntry < Exception; end
+    class BadBooleanValue < Exception; end
+
+    # The Arduino uses a different parameter number for each axis. Ex:
+    # MOVEMENT_TIMEOUT_X is 11 and MOVEMENT_TIMEOUT_Y is 12. To keep things dry,
+    # this method will lookup the correct paramater numer based on the axis
+    # provided and the three options available (if_x, if_y, if_z)
+    def set_paramater_value(axis, value, if_x, if_y, if_z)
+      param_num = { 'x' => if_x, 'y' => if_y, 'z' => if_z }[axis.to_s.downcase]
+      raise InvalidAxisEntry, "You entered an invalid axis" unless param_num
+      write { "F22 P#{param_num} V#{value.to_s}" }
+    end
 
     def write(&blk)
       bot.write(FB::Gcode.new(&blk))
+    end
+
+    def bool_to_int(value)
+      case value
+      when true, 'true', 1, '1'   then 1
+      when false, 'false', 0, '0' then 0
+      else
+        raise BadBooleanValue, "Farmbot expected a boolean value in one of "\
+                               "the following forms: [true, false, 1, 0]"
+      end
     end
   end
 end

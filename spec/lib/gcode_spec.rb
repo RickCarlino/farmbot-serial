@@ -44,10 +44,5 @@ describe FB::Gcode do
     expect(FB::Gcode.new{ "  " }.cmd.head).to eq(null_token.head)
     expect(FB::Gcode.new{ "  " }.cmd.tail).to eq(null_token.tail)
   end
-
-  it 'sets dyanmic parameters' do
-    random_gcode = FB::Gcode.new{ "Q#{Time.now.to_f.to_s[-2, 2]}" }
-    expect(random_gcode.cmd.tail).to_not eq(random_gcode.cmd.tail)
-  end
 end
 

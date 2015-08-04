@@ -54,10 +54,6 @@ module FB
       bot.status[:busy] = 1
     end
 
-    def write_parameter(gcode)
-      raise 'write_parameter is not yet implemented.'
-    end
-
     def report_software_version(gcode)
       nil # Don't need the info right now.
     end
