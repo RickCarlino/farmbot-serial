@@ -1,3 +1,4 @@
+require 'ostruct'
 module FB
   class Status
     # Map of informational status and default values for status within Arduino.
@@ -48,12 +49,12 @@ module FB
 
     def set(key, val)
       transaction do |info|
-        info[Gcode::PARAMETER_DICTIONARY.fetch(key, key.to_s)] = val
+        info[Gcode::PARAMETER_DICTIONARY.fetch(key, "PIN_#{key}".to_sym)] = val
       end
     end
 
     def pin(num)
-      case get(num)
+      case get("PIN_#{num}")
       when false, 0, :off then :off
       when true, 1, :on then :on
       else; :unknown
