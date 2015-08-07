@@ -51,21 +51,29 @@ module FB
       write { "G28" }
     end
 
+    # Parameters are settings, which is not to be confused with status.
     def read_parameter(num)
       write { "F21 P#{num}" }
+    end
+
+    def read_pin(pin, mode = :digital)
+      unless [:analog, :digital].include?(mode)
+        raise "Mode must be :analog or :digital"
+      end
+      write { "F42 P#{pin} M#{(mode == :digital) ? 0 : 1}" }
+    end
+
+    def read_status(num)
+      write { "F31 P#{num}" }
     end
 
     def write_parameter(num, val)
       write { "F22 P#{num} V#{val}" }
     end
 
-    def read_status(pin)
-      write { "F31 P#{pin}" }
-    end
-
-    def pin_write(pin:, value:, mode:)
+    def write_pin(pin:, value:, mode:)
       write { "F41 P#{pin} V#{value} M#{mode}" }
-      bot.status.set(pin, value)
+      bot.status.set_pin(pin, value)
     end
 
     def set_max_speed(axis, value)

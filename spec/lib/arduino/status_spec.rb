@@ -46,9 +46,9 @@ describe FB::Status do
   end
 
   it 'reads known and unknow pin values' do
-    status.set(1, 1)
-    expect(status.pin(1)).to eq(:on)
-    expect(status.pin(2)).to eq(:unknown)
+    status.set_pin(1, 1)
+    expect(status.get_pin(1)).to eq(:on)
+    expect(status.get_pin(2)).to eq(:unknown)
   end
 
   it 'serializes into a hash' do

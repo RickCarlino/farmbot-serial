@@ -2,7 +2,7 @@ require 'ostruct'
 module FB
   class Status
     # Map of informational status and default values for status within Arduino.
-    DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, BUSY: 1, LAST: 'none'}
+    DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, BUSY: 1, LAST: 'none', PINS: {}}
 
     def initialize
       @changes = EM::Channel.new
@@ -22,7 +22,7 @@ module FB
     end
 
     def [](value)
-      @info[value.upcase.to_s]
+      @info[value.to_s.upcase] || :unknown
     end
 
     def to_h
@@ -43,21 +43,18 @@ module FB
       self[:BUSY] == 0
     end
 
-    def get(val)
-      @info[val.to_s.upcase] || :unknown
+    def get_pin(num)
+      @info.PINS[num] || :unknown
+    end
+
+    def set_pin(num, val)
+      val = [true, 1, '1'].include?(val) ? :on : :off
+      transaction { |info| info.PINS[num] = val }
     end
 
     def set(key, val)
       transaction do |info|
         info[Gcode::PARAMETER_DICTIONARY.fetch(key, "PIN_#{key}".to_sym)] = val
-      end
-    end
-
-    def pin(num)
-      case get("PIN_#{num}")
-      when false, 0, :off then :off
-      when true, 1, :on then :on
-      else; :unknown
       end
     end
   end

@@ -25,7 +25,11 @@ module FB
       bot.status.set(gcode.value_of(:P), gcode.value_of(:V))
     end
 
-    def reporting_end_stops(gcode)
+    def report_pin_value(gcode)
+      bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
+    end
+
+    def report_end_stops(gcode)
       bot.status.gcode_update(gcode)
     end
 

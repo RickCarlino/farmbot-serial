@@ -70,7 +70,7 @@ describe FB::OutgoingHandler do
   end
 
   it 'writes to a pin' do
-    handler.pin_write(pin: 0, value: 1, mode: 3)
+    handler.write_pin(pin: 0, value: 1, mode: 3)
     expect(bot.next_cmd.to_s).to eq("F41 P0 V1 M3")
   end
 
