@@ -22,7 +22,7 @@ module FB
 
     # Called when the Ardunio is reporting the status of a parameter.
     def report_parameter_value(gcode)
-      bot.status.set(gcode.value_of(:P), gcode.value_of(:V))
+      bot.status.set_parameter(gcode.value_of(:P), gcode.value_of(:V))
     end
 
     def report_pin_value(gcode)
