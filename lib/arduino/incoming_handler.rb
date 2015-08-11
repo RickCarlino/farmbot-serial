@@ -22,10 +22,14 @@ module FB
 
     # Called when the Ardunio is reporting the status of a parameter.
     def report_parameter_value(gcode)
-      bot.status.set(gcode.value_of(:P), gcode.value_of(:V))
+      bot.status.set_parameter(gcode.value_of(:P), gcode.value_of(:V))
     end
 
-    def reporting_end_stops(gcode)
+    def report_pin_value(gcode)
+      bot.status.set_pin(gcode.value_of(:P), gcode.value_of(:V))
+    end
+
+    def report_end_stops(gcode)
       bot.status.gcode_update(gcode)
     end
 
@@ -52,10 +56,6 @@ module FB
 
     def busy(gcode)
       bot.status[:busy] = 1
-    end
-
-    def write_parameter(gcode)
-      raise 'write_parameter is not yet implemented.'
     end
 
     def report_software_version(gcode)

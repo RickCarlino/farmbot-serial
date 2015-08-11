@@ -18,15 +18,15 @@ describe FB::IncomingHandler do
   end
 
   it 'reports the value of a parameter' do
-    handler.report_parameter_value(FB::Gcode.new { "A1 P1 V0" })
-    expect(bot.status.pin(1)).to eq(:off)
-    handler.report_parameter_value(FB::Gcode.new { "A1 P1 V1" })
-    expect(bot.status.pin(1)).to eq(:on)
+    handler.report_pin_value(FB::Gcode.new { "A1 P1 V0" })
+    expect(bot.status.get_pin(1)).to eq(:off)
+    handler.report_pin_value(FB::Gcode.new { "A1 P1 V1" })
+    expect(bot.status.get_pin(1)).to eq(:on)
   end
 
   it 'reports end stops' do
     gcode = FB::Gcode.new { "LOL1 S99" }
-    handler.reporting_end_stops(gcode)
+    handler.report_end_stops(gcode)
     expect(bot.status[:S]).to eq(99)
   end
 
@@ -37,10 +37,10 @@ describe FB::IncomingHandler do
   end
 
   it 'reports the value of a status' do
-    handler.report_status_value(FB::Gcode.new { "A1 P1 V0" })
-    expect(bot.status.pin(1)).to eq(:off)
-    handler.report_status_value(FB::Gcode.new { "A1 P1 V1" })
-    expect(bot.status.pin(1)).to eq(:on)
+    handler.report_pin_value(FB::Gcode.new { "A1 P1 V0" })
+    expect(bot.status.get_pin(1)).to eq(:off)
+    handler.report_pin_value(FB::Gcode.new { "A1 P1 V1" })
+    expect(bot.status.get_pin(1)).to eq(:on)
   end
 
   it 'responds to message received' do
