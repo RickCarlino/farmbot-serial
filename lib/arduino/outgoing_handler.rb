@@ -69,6 +69,8 @@ module FB
 
     def write_parameter(num, val)
       write { "F22 P#{num} V#{val}" }
+      key = Gcode::PARAMETER_DICTIONARY.fetch(num, "UNKNOWN_PARAMETER_#{num}")
+      bot.status.transaction { |i| i[key] = val }
     end
 
     def write_pin(pin:, value:, mode:)

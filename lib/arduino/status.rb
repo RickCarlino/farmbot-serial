@@ -54,7 +54,8 @@ module FB
 
     def set_parameter(key, val)
       transaction do |info|
-        info[Gcode::PARAMETER_DICTIONARY.fetch(key, "PIN_#{key}".to_sym)] = val
+        info[Gcode::PARAMETER_DICTIONARY.fetch(key,
+          "UNKNOWN_PARAMETER_#{key}".to_sym)] = val
       end
     end
   end
