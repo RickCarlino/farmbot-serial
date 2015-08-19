@@ -4,8 +4,9 @@ require_relative 'arduino/incoming_handler'
 require_relative 'arduino/outgoing_handler'
 require_relative 'arduino/event_machine'
 require_relative 'arduino/status'
-# Communicate with the arduino using a serial interface
 module FB
+  # Software abstraction layer for the Arduino's serial interface. Translates
+  # Ruby method calls into serial commands.
   class Arduino
     Position = Struct.new(:x, :y, :z)
 

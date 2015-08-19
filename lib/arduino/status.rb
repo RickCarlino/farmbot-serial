@@ -1,5 +1,8 @@
 require 'ostruct'
 module FB
+  # A status register that caches the state of the Arduino into a struct. Also
+  # broadcasts changes that can be hooked into via the onchange() event.
+  # bot.status[:X] # => Returns bot X coordinate.
   class Status
     # Map of informational status and default values for status within Arduino.
     DEFAULT_INFO = {X: 0, Y: 0, Z: 0, S: 10, BUSY: 1, LAST: 'none', PINS: {}}

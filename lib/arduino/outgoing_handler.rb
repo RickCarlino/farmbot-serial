@@ -1,6 +1,6 @@
 module FB
-  # Responsible for writing to the serial line. Sends Gcode from the pi to the
-  # arduino. (Pi -> Arduino)
+  # Writes GCode to the serial line. Creates messages the travel from the PI to
+  # the ARDUINO.
   class OutgoingHandler
     attr_reader :bot
 
