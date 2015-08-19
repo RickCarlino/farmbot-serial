@@ -1,5 +1,5 @@
 module FB
-  # Handles Gcode that moves from the Arduino to the Pi (Arduino -> Pi).
+  # Handles Gcode that was sent by the ARDUINO to the RASPBERRY PI.
   class IncomingHandler
     attr_reader :bot
 

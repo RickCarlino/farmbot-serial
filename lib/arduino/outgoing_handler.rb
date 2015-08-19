@@ -1,6 +1,6 @@
 module FB
-  # Responsible for writing to the serial line. Sends Gcode from the pi to the
-  # arduino. (Pi -> Arduino)
+  # Writes GCode to the serial line. Creates messages the travel from the PI to
+  # the ARDUINO.
   class OutgoingHandler
     attr_reader :bot
 
@@ -69,6 +69,8 @@ module FB
 
     def write_parameter(num, val)
       write { "F22 P#{num} V#{val}" }
+      key = Gcode::PARAMETER_DICTIONARY.fetch(num, "UNKNOWN_PARAMETER_#{num}")
+      bot.status.transaction { |i| i[key] = val }
     end
 
     def write_pin(pin:, value:, mode:)

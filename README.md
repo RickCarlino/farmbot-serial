@@ -1,3 +1,9 @@
+# STOP! You might not need this.
+
+`farmbot-serial` is a component used by the [Farmbot Raspberry Pi](https://github.com/FarmBot/farmbot-raspberry-pi-controller). If you are just trying to install a FarmBot, you do not need to use this. This component will be auto installed when you install the [Raspberry Pi Controller](https://github.com/FarmBot/farmbot-raspberry-pi-controller).
+
+If you are a developer looking to work directly with the FarmBot serial interface, you're in the right place.
+
 # Farmbot-Serial
 
 A ruby gem for controlling Farmbot via serial line with EventMachine.

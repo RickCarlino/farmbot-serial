@@ -1,8 +1,9 @@
 require 'serialport'
 
-# This object creates a Serial IO with sane defaults, since most FarmBot setups
-# follow the same serial configuration setup. You can build your own SerialPort
-# object also, if that's what you need.
+# This object creates a Serial IO Object with sane defaults, since most FarmBot
+# setups follow the same serial configuration setup. You can build your own
+# SerialPort object also, if that's what you need. DefaultSerialPort is just a
+# suggestion, rather than the only option. Any serial connection will work.
 module FB
   class DefaultSerialPort < SerialPort
     COM_PORT = '/dev/ttyACM0'
